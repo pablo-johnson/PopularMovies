@@ -1,18 +1,21 @@
 package com.johnson.pablo.popularmovies.ui;
 
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.johnson.pablo.popularmovies.R;
+import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.models.MovieResponse;
 
-import java.util.List;
-
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -23,6 +26,8 @@ import retrofit.Response;
 public class MainActivityFragment extends Fragment {
 
     private Call<MovieResponse> callMovies;
+    @Bind(R.id.moviesGrid)
+    RecyclerView moviesRecyclerView;
 
     public MainActivityFragment() {
     }
@@ -31,8 +36,15 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, contentView);
+        setUpRecyclerView();
         getTopRatedMovies();
         return contentView;
+    }
+
+    private void setUpRecyclerView() {
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        moviesRecyclerView.setLayoutManager(mGridLayoutManager);
     }
 
     @Override
@@ -54,12 +66,14 @@ public class MainActivityFragment extends Fragment {
         callMovies.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Response<MovieResponse> response) {
-                Log.e("Pablo", "Size: " + response.body().getResults().size());
+                MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MainActivityFragment.this,
+                        response.body().getResults());
+                moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
             }
 
             @Override
             public void onFailure(Throwable t) {
-                Log.e("Pablo",t.getMessage());
+                Log.e("Pablo", t.getMessage());
             }
         });
     }

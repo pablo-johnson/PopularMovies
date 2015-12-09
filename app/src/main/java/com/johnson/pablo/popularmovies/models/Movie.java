@@ -12,18 +12,25 @@ import retrofit.http.Field;
 public class Movie implements Serializable {
 
     private int id;
+    @SerializedName("poster_path")
     private String posterPath;
     private String overview;
+    @SerializedName("release_date")
     private String releaseDate;
+    @SerializedName("original_title")
     private String originalTitle;
+    @SerializedName("original_language")
     private String originalLanguage;
     private String title;
+    @SerializedName("backdrop_path")
     private String backDropPath;
-    private Long popularity;
+    private Double popularity;
+    @SerializedName("vote_count")
     private int voteCount;
     @SerializedName("video")
     private boolean hasVideo;
-    private int voteAverage;
+    @SerializedName("vote_average")
+    private Double voteAverage;
 
     public int getId() {
         return id;
@@ -89,11 +96,11 @@ public class Movie implements Serializable {
         this.backDropPath = backDropPath;
     }
 
-    public Long getPopularity() {
+    public Double getPopularity() {
         return popularity;
     }
 
-    public void setPopularity(Long popularity) {
+    public void setPopularity(Double popularity) {
         this.popularity = popularity;
     }
 
@@ -113,11 +120,11 @@ public class Movie implements Serializable {
         this.hasVideo = hasVideo;
     }
 
-    public int getVoteAverage() {
+    public Double getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(int voteAverage) {
+    public void setVoteAverage(Double voteAverage) {
         this.voteAverage = voteAverage;
     }
 }
