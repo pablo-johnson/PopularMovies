@@ -2,7 +2,9 @@ package com.johnson.pablo.popularmovies.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +45,8 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void setUpRecyclerView() {
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL,false);
+        moviesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         moviesRecyclerView.setLayoutManager(mGridLayoutManager);
     }
 
@@ -67,7 +70,7 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onResponse(Response<MovieResponse> response) {
                 MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MainActivityFragment.this,
-                        response.body().getResults());
+                        response.body().getResults(), moviesRecyclerView.getWidth());
                 moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
             }
 
