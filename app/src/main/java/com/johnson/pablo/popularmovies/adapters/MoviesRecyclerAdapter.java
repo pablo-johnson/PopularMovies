@@ -3,20 +3,17 @@ package com.johnson.pablo.popularmovies.adapters;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.florent37.picassopalette.BitmapPalette;
-import com.github.florent37.picassopalette.PicassoPalette;
+import com.bumptech.glide.Glide;
+import com.github.florent37.glidepalette.GlidePalette;
 import com.johnson.pablo.popularmovies.BuildConfig;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.models.Movie;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +33,7 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
     public MoviesRecyclerAdapter(@NonNull Fragment fragment, @NonNull List<Movie> movies, int width) {
         super(fragment.getActivity(), movies == null ? new ArrayList<Movie>() : movies);
         mFragment = fragment;
-        realWidth = width / 2;
-        setHasStableIds(true);
+        realWidth = width;
     }
 
     @Override
@@ -49,16 +45,16 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Log.e("Pablo", position + " " + buildPosterUrl(mMovies.get(position).getPosterPath()));
         Movie movie = mMovies.get(position);
-        Log.e("Pablo", "id " + movie.getId());
         String url = buildPosterUrl(movie.getPosterPath());
-        Picasso.with(mFragment.getContext())
+        Glide.with(mFragment)
                 .load(url)
-                .placeholder(R.color.movie_poster_placeholder)
-                .into(((MovieHolder) holder).movieImage, PicassoPalette.with(url, ((MovieHolder) holder).movieImage)
-                        .use(PicassoPalette.Profile.MUTED_DARK)
+                .crossFade()
+                .listener(GlidePalette.with(url)
+                        .use(GlidePalette.Profile.VIBRANT)
                         .intoBackground(((MovieHolder) holder).movieTitle)
-                        .intoTextColor(((MovieHolder) holder).movieTitle));
-
+                        .intoTextColor(((MovieHolder) holder).movieTitle))
+                .placeholder(R.color.movie_poster_placeholder)
+                .into(((MovieHolder) holder).movieImage);
 
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
     }
