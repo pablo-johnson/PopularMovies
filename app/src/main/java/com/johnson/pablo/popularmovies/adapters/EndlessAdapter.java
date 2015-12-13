@@ -30,12 +30,28 @@ public abstract class EndlessAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mMovies = items;
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return isLoadMore(position) ? VIEW_TYPE_LOAD_MORE : VIEW_TYPE_ITEM;
+    public void setLoadMore(boolean enabled) {
+        if (showLoadMore != enabled) {
+            if (showLoadMore) {
+                notifyItemRemoved(getItemCount());
+                showLoadMore = false;
+            } else {
+                notifyItemInserted(getItemCount());
+                showLoadMore = true;
+            }
+        }
     }
 
-    public boolean isLoadMore(int position) {
+    public boolean isLoadMore() {
+        return showLoadMore;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return isItemLoadMoreType(position) ? VIEW_TYPE_LOAD_MORE : VIEW_TYPE_ITEM;
+    }
+
+    public boolean isItemLoadMoreType(int position) {
         return showLoadMore && (position == (getItemCount() - 1));
     }
 
@@ -60,7 +76,7 @@ public abstract class EndlessAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     public T getItem(int position) {
-        return !isLoadMore(position) ? mMovies.get(position) : null;
+        return !isItemLoadMoreType(position) ? mMovies.get(position) : null;
     }
 
     public void clear() {

@@ -43,13 +43,11 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Log.e("Pablo", position + " " + buildPosterUrl(mMovies.get(position).getPosterPath()));
         Movie movie = mMovies.get(position);
-        String url = buildPosterUrl(movie.getPosterPath());
         Glide.with(mFragment)
-                .load(url)
+                .load(movie.getPosterPath())
                 .crossFade()
-                .listener(GlidePalette.with(url)
+                .listener(GlidePalette.with(movie.getPosterPath())
                         .use(GlidePalette.Profile.VIBRANT)
                         .intoBackground(((MovieHolder) holder).movieTitle)
                         .intoTextColor(((MovieHolder) holder).movieTitle))
@@ -57,24 +55,6 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
                 .into(((MovieHolder) holder).movieImage);
 
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
-    }
-
-    public static String buildPosterUrl(@NonNull String imagePath) {
-        String widthPath;
-        if (realWidth <= 92) {
-            widthPath = "w92";
-        } else if (realWidth <= 154) {
-            widthPath = "w154";
-        } else if (realWidth <= 240) {
-            widthPath = "w185";
-        } else if (realWidth <= 400) {
-            widthPath = "w342";
-        } else if (realWidth <= 560) {
-            widthPath = "w500";
-        } else {
-            widthPath = "w780";
-        }
-        return BuildConfig.IMAGE_URL + widthPath + imagePath;
     }
 
     final class MovieHolder extends RecyclerView.ViewHolder {

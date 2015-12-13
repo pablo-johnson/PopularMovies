@@ -1,5 +1,6 @@
 package com.johnson.pablo.popularmovies.helpers;
 
+import com.johnson.pablo.popularmovies.BuildConfig;
 import com.johnson.pablo.popularmovies.interfaces.MovieApiService;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -12,7 +13,6 @@ import retrofit.Retrofit;
 public class MovieApi {
 
     private static MovieApi instance;
-    public static final String ENDPOINT_URL = "https://api.themoviedb.org/3/";
     private MovieApiService service;
 
 
@@ -28,11 +28,11 @@ public class MovieApi {
 
     public MovieApiService getRetrofitService() {
         if (service == null) {
-            OkHttpClient client = new OkHttpClient();
+            OkHttpClient client = OkHttpSingleTonClass.getOkHttpClient();
             //Add and interceptor to log all the requests and responses
-            client.interceptors().add(new LoggingInterceptor());
+            //client.interceptors().add(new LoggingInterceptor());
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(ENDPOINT_URL)
+                    .baseUrl(BuildConfig.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build();
