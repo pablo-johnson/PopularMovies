@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
+import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
 import com.johnson.pablo.popularmovies.models.MovieResponse;
 
 import butterknife.Bind;
@@ -40,19 +41,27 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_main, container, false);
-        columnNumber = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 2 : 3;
+        columnNumber = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ? 2 : 3;
         ButterKnife.bind(this, contentView);
         setUpRecyclerView();
-        getTopRatedMovies();
         return contentView;
     }
 
     private void setUpRecyclerView() {
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(),
-                columnNumber,
-                GridLayoutManager.VERTICAL, false);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), columnNumber);
         moviesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         moviesRecyclerView.setLayoutManager(mGridLayoutManager);
+        final MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MainActivityFragment.this, null);
+        moviesRecyclerView.addOnScrollListener(new EndlessScrollListener(mGridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                getTopRatedMovies(moviesRecyclerAdapter, ++page);
+                Log.e("Pablo page", "" + page);
+            }
+        });
+        moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
+
+        getTopRatedMovies(moviesRecyclerAdapter, 1);
     }
 
     @Override
@@ -69,14 +78,12 @@ public class MainActivityFragment extends Fragment {
         super.onPause();
     }
 
-    public void getTopRatedMovies() {
-        callMovies = MovieApi.get().getRetrofitService().getTopRated();
+    public void getTopRatedMovies(final MoviesRecyclerAdapter adapter, int page) {
+        callMovies = MovieApi.get().getRetrofitService().getTopRated(page);
         callMovies.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Response<MovieResponse> response) {
-                MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MainActivityFragment.this,
-                        response.body().getResults(), moviesRecyclerView.getWidth()/columnNumber);
-                moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
+                adapter.add(response.body().getResults());
             }
 
             @Override

@@ -3,7 +3,6 @@ package com.johnson.pablo.popularmovies.adapters;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.github.florent37.glidepalette.GlidePalette;
-import com.johnson.pablo.popularmovies.BuildConfig;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.models.Movie;
 
@@ -28,12 +26,10 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
 
     @NonNull
     private final Fragment mFragment;
-    private static float realWidth;
 
-    public MoviesRecyclerAdapter(@NonNull Fragment fragment, @NonNull List<Movie> movies, int width) {
+    public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies) {
         super(fragment.getActivity(), movies == null ? new ArrayList<Movie>() : movies);
         mFragment = fragment;
-        realWidth = width;
     }
 
     @Override

@@ -1,8 +1,7 @@
-package com.johnson.pablo.popularmovies.helpers;
+package com.johnson.pablo.popularmovies.configurations;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
@@ -14,6 +13,7 @@ import com.bumptech.glide.load.model.stream.BaseGlideUrlLoader;
 import com.bumptech.glide.load.model.stream.StreamModelLoader;
 import com.bumptech.glide.module.GlideModule;
 import com.johnson.pablo.popularmovies.BuildConfig;
+import com.johnson.pablo.popularmovies.helpers.OkHttpSingletonClass;
 
 import java.io.InputStream;
 
@@ -52,7 +52,7 @@ public class MyGlideModule implements GlideModule {
     @Override
     public void registerComponents(Context context, Glide glide) {
         glide.register(String.class, InputStream.class, new ImageLoader.Factory());
-        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(OkHttpSingleTonClass.getOkHttpClient()));
+        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(OkHttpSingletonClass.getOkHttpClient()));
     }
 
     private static class ImageLoader extends BaseGlideUrlLoader<String> {

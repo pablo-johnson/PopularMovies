@@ -10,10 +10,10 @@ import java.io.File;
 /**
  * Created by Pablo on 12/12/15.
  */
-public class OkHttpSingleTonClass {
+public class OkHttpSingletonClass {
     private static OkHttpClient okHttpClient;
 
-    private OkHttpSingleTonClass() {
+    private OkHttpSingletonClass() {
     }
 
     public static OkHttpClient getOkHttpClient() {
