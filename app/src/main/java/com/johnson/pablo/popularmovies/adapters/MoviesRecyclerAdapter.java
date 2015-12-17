@@ -24,8 +24,16 @@ import butterknife.ButterKnife;
  */
 public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerAdapter.MovieHolder> {
 
+    public interface OnMovieClickListener {
+        void onMovieClicked(@NonNull final Movie movie, View view, int position);
+
+        void onFavoredClicked(@NonNull final Movie movie, int position);
+    }
+
     @NonNull
     private final Fragment mFragment;
+    @NonNull
+    private OnMovieClickListener mListener;
 
     public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies) {
         super(fragment.getActivity(), movies == null ? new ArrayList<Movie>() : movies);
@@ -34,12 +42,18 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
 
     @Override
     protected MovieHolder onCreateItemHolder(ViewGroup parent, int viewType) {
-        return new MovieHolder(mInflater.inflate(R.layout.movie_grid_item, parent, false));
+        return new MovieHolder(mInflater.inflate(R.layout.item_movie_grid, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Movie movie = mMovies.get(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        final Movie movie = mMovies.get(position);
+        ((MovieHolder) holder).movieContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onMovieClicked(movie, view, position);
+            }
+        });
         Glide.with(mFragment)
                 .load(movie.getPosterPath())
                 .crossFade()
@@ -53,11 +67,17 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
     }
 
+    public void setListener(@NonNull OnMovieClickListener listener) {
+        this.mListener = listener;
+    }
+
     final class MovieHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.movieImage)
         ImageView movieImage;
         @Bind(R.id.movieTitle)
         TextView movieTitle;
+        @Bind(R.id.movieItemContainer)
+        View movieContainer;
 
 
         public MovieHolder(View itemView) {

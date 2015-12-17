@@ -2,6 +2,7 @@ package com.johnson.pablo.popularmovies.ui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,12 +11,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
+import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.MovieResponse;
+import com.johnson.pablo.popularmovies.models.Sort;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,21 +32,23 @@ import retrofit.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter.OnMovieClickListener {
 
     private Call<MovieResponse> callMovies;
     @Bind(R.id.moviesGrid)
     RecyclerView moviesRecyclerView;
+    Sort defSort = Sort.fromString("popularity.desc");
+
     private int columnNumber;
 
 
-    public MainActivityFragment() {
+    public MovieGridFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View contentView = inflater.inflate(R.layout.fragment_main, container, false);
+        View contentView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         columnNumber = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ? 2 : 3;
         ButterKnife.bind(this, contentView);
         setUpRecyclerView();
@@ -51,17 +59,17 @@ public class MainActivityFragment extends Fragment {
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), columnNumber);
         moviesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         moviesRecyclerView.setLayoutManager(mGridLayoutManager);
-        final MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MainActivityFragment.this, null);
+        final MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MovieGridFragment.this, null);
+        moviesRecyclerAdapter.setListener(this);
         moviesRecyclerView.addOnScrollListener(new EndlessScrollListener(mGridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                getTopRatedMovies(moviesRecyclerAdapter, ++page);
-                Log.e("Pablo page", "" + page);
+                getMovies(moviesRecyclerAdapter, ++page, defSort, false);
             }
         });
         moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
 
-        getTopRatedMovies(moviesRecyclerAdapter, 1);
+        getMovies(moviesRecyclerAdapter, 1, defSort, false);
     }
 
     @Override
@@ -78,8 +86,16 @@ public class MainActivityFragment extends Fragment {
         super.onPause();
     }
 
-    public void getTopRatedMovies(final MoviesRecyclerAdapter adapter, int page) {
-        callMovies = MovieApi.get().getRetrofitService().getTopRated(page);
+    public void getMovies(Sort sort) {
+        defSort = sort;
+        getMovies((MoviesRecyclerAdapter) moviesRecyclerView.getAdapter(), 1, defSort, true);
+    }
+
+    private void getMovies(final MoviesRecyclerAdapter adapter, int page, Sort sort, boolean clearMovies) {
+        if (clearMovies) {
+            adapter.clear();
+        }
+        callMovies = MovieApi.get().getRetrofitService().getTopRated(page, sort);
         callMovies.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Response<MovieResponse> response) {
@@ -91,5 +107,18 @@ public class MainActivityFragment extends Fragment {
                 Log.e("Pablo", t.getMessage());
             }
         });
+    }
+
+    @Override
+    public void onMovieClicked(@NonNull Movie movie, View view, int position) {
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment, DetailMovieFragment.newInstance(movie))
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void onFavoredClicked(@NonNull Movie movie, int position) {
+
     }
 }
