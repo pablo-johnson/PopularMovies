@@ -1,5 +1,7 @@
 package com.johnson.pablo.popularmovies.adapters;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -54,6 +56,7 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
                 mListener.onMovieClicked(movie, view, position);
             }
         });
+        ImageView imageView = ((MovieHolder) holder).movieImage;
         Glide.with(mFragment)
                 .load(movie.getPosterPath())
                 .crossFade()
@@ -62,7 +65,10 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
                         .intoBackground(((MovieHolder) holder).movieTitle)
                         .intoTextColor(((MovieHolder) holder).movieTitle))
                 .placeholder(R.color.movie_poster_placeholder)
-                .into(((MovieHolder) holder).movieImage);
+                .into(imageView);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            imageView.setTransitionName("transition_image_" + position);
+        }
 
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
     }

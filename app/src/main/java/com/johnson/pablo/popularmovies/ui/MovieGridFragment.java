@@ -153,7 +153,21 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         ImageView imageView = (ImageView) view.findViewById(R.id.movieImage);
         if (mListener.isTwoPanel()) {
             MovieDetailFragment detailMovieFragment = MovieDetailFragment.newInstance(movie);
+            Bundle bundle = detailMovieFragment.getArguments();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                setSharedElementReturnTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(R.transition.change_image_trans));
+                setExitTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(android.R.transition.fade));
 
+                detailMovieFragment.setSharedElementEnterTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(R.transition.change_image_trans));
+                detailMovieFragment.setEnterTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(android.R.transition.fade));
+
+                bundle.putString("IMAGE_TRANSITION_NAME", imageView.getTransitionName());
+                Log.e("Pablo", imageView.getTransitionName());
+            }
             getFragmentManager().beginTransaction()
                     .add(R.id.movieDetailContainer, detailMovieFragment)
                     .addToBackStack("Detail")
@@ -162,7 +176,14 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         } else {
             Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
             intent.putExtra(MovieDetailActivity.MOVIE, movie);
-            startActivity(intent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(getActivity(), imageView, getString(R.string.fragment_image_trans));
+                getActivity().startActivity(intent, options.toBundle());
+            }
+            else {
+                startActivity(intent);
+            }
         }
 
     }
