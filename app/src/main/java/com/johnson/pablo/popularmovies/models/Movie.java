@@ -1,43 +1,43 @@
 package com.johnson.pablo.popularmovies.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit.http.Field;
 
 /**
  * Created by pablo on 12/7/15.
  */
-public class Movie implements Serializable {
+public class Movie implements Parcelable {
 
-    private int id;
-    @SerializedName("poster_path")
-    private String posterPath;
+    private long id;
     private String overview;
     @SerializedName("release_date")
     private String releaseDate;
-    @SerializedName("original_title")
-    private String originalTitle;
-    @SerializedName("original_language")
-    private String originalLanguage;
-    private String title;
+    @SerializedName("poster_path")
+    private String posterPath;
     @SerializedName("backdrop_path")
     private String backDropPath;
     private Double popularity;
-    @SerializedName("vote_count")
-    private int voteCount;
-    @SerializedName("video")
-    private boolean hasVideo;
+    @SerializedName("original_title")
+    private String title;
     @SerializedName("vote_average")
     private Double voteAverage;
+    @SerializedName("vote_count")
+    private long voteCount;
+    private String originalTitle;
+    @SerializedName("original_language")
+    private String originalLanguage;
+    @SerializedName("video")
+    private boolean hasVideo;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public Movie() {
     }
 
     public String getPosterPath() {
@@ -104,14 +104,6 @@ public class Movie implements Serializable {
         this.popularity = popularity;
     }
 
-    public int getVoteCount() {
-        return voteCount;
-    }
-
-    public void setVoteCount(int voteCount) {
-        this.voteCount = voteCount;
-    }
-
     public boolean isHasVideo() {
         return hasVideo;
     }
@@ -127,4 +119,80 @@ public class Movie implements Serializable {
     public void setVoteAverage(Double voteAverage) {
         this.voteAverage = voteAverage;
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(long voteCount) {
+        this.voteCount = voteCount;
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeString(this.overview);
+        dest.writeString(this.releaseDate);
+        dest.writeString(this.posterPath);
+        dest.writeString(this.backDropPath);
+        dest.writeDouble(this.popularity);
+        dest.writeString(this.title);
+        dest.writeDouble(this.voteAverage);
+        dest.writeLong(this.voteCount);
+        dest.writeString(this.originalTitle);
+        dest.writeString(this.originalLanguage);
+        dest.writeByte(hasVideo ? (byte) 1 : (byte) 0);
+    }
+
+    protected Movie(Parcel in) {
+        this.id = in.readLong();
+        this.overview = in.readString();
+        this.releaseDate = in.readString();
+        this.posterPath = in.readString();
+        this.backDropPath = in.readString();
+        this.popularity = in.readDouble();
+        this.title = in.readString();
+        this.voteAverage = in.readDouble();
+        this.voteCount = in.readLong();
+        this.originalTitle = in.readString();
+        this.originalLanguage = in.readString();
+        this.hasVideo = in.readByte() != 0;
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
