@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/id"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:orientation="horizontal">
+
+    <fragment
+        android:id="@+id/fragment"
+        android:name="com.johnson.pablo.popularmovies.ui.MovieGridFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        tools:layout="@layout/fragment_movie_grid" />
+
+    <fragment
+        android:id="@+id/movieDetailContainer"
+        android:name="com.johnson.pablo.popularmovies.ui.MovieDetailFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        tools:layout="@layout/fragment_movie_detail" />
+
+</LinearLayout>

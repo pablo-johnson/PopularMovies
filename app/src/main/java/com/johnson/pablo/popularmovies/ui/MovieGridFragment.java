@@ -1,23 +1,28 @@
 package com.johnson.pablo.popularmovies.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
+import android.widget.ImageView;
 
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
+import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
 import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.MovieResponse;
@@ -40,9 +45,37 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     Sort defSort = Sort.fromString("popularity.desc");
 
     private int columnNumber;
+    private boolean mTwoPane;
+    private OnFragmentInteractionListener mListener;
 
 
     public MovieGridFragment() {
+    }
+
+    public static MovieGridFragment newInstance() {
+        MovieGridFragment fragment = new MovieGridFragment();
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     @Override
@@ -53,6 +86,12 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         ButterKnife.bind(this, contentView);
         setUpRecyclerView();
         return contentView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mTwoPane = mListener.isTwoPanel();
     }
 
     private void setUpRecyclerView() {
@@ -111,10 +150,21 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
 
     @Override
     public void onMovieClicked(@NonNull Movie movie, View view, int position) {
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment, DetailMovieFragment.newInstance(movie))
-                .addToBackStack(null)
-                .commit();
+        ImageView imageView = (ImageView) view.findViewById(R.id.movieImage);
+        if (mListener.isTwoPanel()) {
+            MovieDetailFragment detailMovieFragment = MovieDetailFragment.newInstance(movie);
+
+            getFragmentManager().beginTransaction()
+                    .add(R.id.movieDetailContainer, detailMovieFragment)
+                    .addToBackStack("Detail")
+                    .addSharedElement(imageView, getString(R.string.fragment_image_trans))
+                    .commit();
+        } else {
+            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+            intent.putExtra(MovieDetailActivity.MOVIE, movie);
+            startActivity(intent);
+        }
+
     }
 
     @Override
