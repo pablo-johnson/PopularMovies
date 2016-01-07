@@ -1,11 +1,13 @@
 package com.johnson.pablo.popularmovies.ui;
 
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
@@ -22,16 +24,26 @@ public class MovieDetailActivity extends AppCompatActivity implements OnFragment
     public static final String MOVIE = "movie";
     @Bind(R.id.toolbar)
     Toolbar toolbar;
+    @Bind(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         ButterKnife.bind(this);
+        Movie movie = getIntent().getParcelableExtra(MOVIE);
 
         if (toolbar != null) {
             ViewCompat.setElevation(toolbar, getResources().getDimension(R.dimen.toolbar_elevation));
-            //mToolbar.setNavigationOnClickListener(new Navig);
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    supportFinishAfterTransition();
+                }
+            });
+
 
             ActionBar ab = getSupportActionBar();
             if (ab != null) {
@@ -41,12 +53,17 @@ public class MovieDetailActivity extends AppCompatActivity implements OnFragment
             }
         }
 
-        Movie movie = getIntent().getParcelableExtra(MOVIE);
+        if (collapsingToolbarLayout!=null){
+            collapsingToolbarLayout.setTitle(movie.getTitle());
+        }
 
-        MovieDetailFragment startFragment = MovieDetailFragment.newInstance(movie);
+
+        MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance(movie);
+        Bundle bundle = movieDetailFragment.getArguments();
+        bundle.putAll(getIntent().getExtras());
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.fragment, startFragment)
+                .replace(R.id.fragment, movieDetailFragment)
                 .commit();
     }
 

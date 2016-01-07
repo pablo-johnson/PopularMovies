@@ -46,6 +46,12 @@ public class MovieGridActivity extends AppCompatActivity implements OnFragmentIn
 
             }
         });
+        if (getSupportFragmentManager().findFragmentById(R.id.fragment) == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment, MovieGridFragment.newInstance(), "MovieGridFragmentTag")
+                    .addToBackStack("MovieGridFragmentName")
+                    .commit();
+        }
 
         mTwoPane = movieDetailContainer != null;
     }
@@ -53,6 +59,11 @@ public class MovieGridActivity extends AppCompatActivity implements OnFragmentIn
     @Override
     public void onFragmentInteraction() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

@@ -19,7 +19,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:adjustViewBounds="true"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY"
+            android:transitionName="@string/fragment_image_trans" />
 
         <TextView
             android:id="@+id/movieTitle"

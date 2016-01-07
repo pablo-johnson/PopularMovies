@@ -6,9 +6,11 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.johnson.pablo.popularmovies.R;
@@ -27,6 +29,8 @@ public class MovieDetailFragment extends Fragment {
 
     @Bind(R.id.movieImage)
     ImageView movieImage;
+    @Bind(R.id.movieTitle)
+    TextView movieTitle;
 
     public MovieDetailFragment() {
         //setRetainInstance(true);
@@ -36,6 +40,7 @@ public class MovieDetailFragment extends Fragment {
         MovieDetailFragment fragment = new MovieDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putString("url", movie.getPosterPath());
+        bundle.putString("movieTitle", movie.getTitle());
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -69,9 +74,12 @@ public class MovieDetailFragment extends Fragment {
         if (getArguments() != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Bundle bundle = getArguments();
-                String transitionName = bundle.getString("IMAGE_TRANSITION_NAME");
-                movieImage.setTransitionName(transitionName);
+                String imageTransitionName = bundle.getString("IMAGE_TRANSITION_NAME");
+                movieImage.setTransitionName(imageTransitionName);
+                String titleTransitionName = bundle.getString("TITLE_TRANSITION_NAME");
+                movieTitle.setTransitionName(titleTransitionName);
             }
+            movieTitle.setText(getArguments().getString("movieTitle"));
             Glide.with(this)
                     .load(getArguments().getString("url"))
                     .crossFade()
@@ -79,5 +87,16 @@ public class MovieDetailFragment extends Fragment {
                     .into(movieImage);
         }
         return contentView;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                getActivity().supportFinishAfterTransition();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

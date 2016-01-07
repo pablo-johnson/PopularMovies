@@ -9,15 +9,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
@@ -34,6 +38,8 @@ import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 
+import static android.support.v4.app.ActivityOptionsCompat.*;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -47,6 +53,9 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     private int columnNumber;
     private boolean mTwoPane;
     private OnFragmentInteractionListener mListener;
+    private int mPage = 1;
+    private String STATE_CURRENT_PAGE = "stateCurrentPage";
+    private String STATE_CURRENT_SORT = "stateCurrentSort";
 
 
     public MovieGridFragment() {
@@ -104,11 +113,12 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
                 getMovies(moviesRecyclerAdapter, ++page, defSort, false);
+                mPage = page;
             }
         });
         moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
 
-        getMovies(moviesRecyclerAdapter, 1, defSort, false);
+        getMovies(moviesRecyclerAdapter, mPage, defSort, false);
     }
 
     @Override
@@ -150,38 +160,43 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
 
     @Override
     public void onMovieClicked(@NonNull Movie movie, View view, int position) {
-        ImageView imageView = (ImageView) view.findViewById(R.id.movieImage);
+        ImageView movieImage = (ImageView) view.findViewById(R.id.movieImage);
+        TextView movieTitle = (TextView)view.findViewById(R.id.movieTitle);
+
         if (mListener.isTwoPanel()) {
             MovieDetailFragment detailMovieFragment = MovieDetailFragment.newInstance(movie);
             Bundle bundle = detailMovieFragment.getArguments();
+            FragmentTransaction ft = getFragmentManager().beginTransaction()
+                    .add(R.id.movieDetailContainer, detailMovieFragment);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                setSharedElementReturnTransition(TransitionInflater.from(
-                        getActivity()).inflateTransition(R.transition.change_image_trans));
-                setExitTransition(TransitionInflater.from(
-                        getActivity()).inflateTransition(android.R.transition.fade));
 
-                detailMovieFragment.setSharedElementEnterTransition(TransitionInflater.from(
-                        getActivity()).inflateTransition(R.transition.change_image_trans));
-                detailMovieFragment.setEnterTransition(TransitionInflater.from(
-                        getActivity()).inflateTransition(android.R.transition.fade));
+                Transition changeTransform = TransitionInflater.from(getActivity()).inflateTransition(R.transition.change_image_transform);
+                Transition explodeTransform = TransitionInflater.from(getActivity()).inflateTransition(android.R.transition.explode);
 
-                bundle.putString("IMAGE_TRANSITION_NAME", imageView.getTransitionName());
-                Log.e("Pablo", imageView.getTransitionName());
+                // Setup exit transition on first fragment
+                setSharedElementReturnTransition(changeTransform);
+                setExitTransition(explodeTransform);
+
+                // Setup enter transition on second fragment
+                detailMovieFragment.setSharedElementEnterTransition(changeTransform);
+                detailMovieFragment.setEnterTransition(explodeTransform);
+
+                bundle.putString("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
+
+                ft.addSharedElement(movieImage, movieImage.getTransitionName());
             }
-            getFragmentManager().beginTransaction()
-                    .add(R.id.movieDetailContainer, detailMovieFragment)
-                    .addToBackStack("Detail")
-                    .addSharedElement(imageView, getString(R.string.fragment_image_trans))
-                    .commit();
+            ft.commit();
         } else {
             Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
             intent.putExtra(MovieDetailActivity.MOVIE, movie);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(getActivity(), imageView, getString(R.string.fragment_image_trans));
+                intent.putExtra("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
+                intent.putExtra("TITLE_TRANSITION_NAME", movieTitle.getTransitionName());
+                Pair<View, String> p1 = Pair.create((View)movieImage, movieImage.getTransitionName());
+                Pair<View, String> p2 = Pair.create((View)movieTitle, movieTitle.getTransitionName());
+                ActivityOptionsCompat options = makeSceneTransitionAnimation(getActivity(), p1, p2);
                 getActivity().startActivity(intent, options.toBundle());
-            }
-            else {
+            } else {
                 startActivity(intent);
             }
         }
@@ -191,5 +206,17 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     @Override
     public void onFavoredClicked(@NonNull Movie movie, int position) {
 
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(STATE_CURRENT_SORT, defSort);
+        outState.putInt(STATE_CURRENT_PAGE, mPage);
     }
 }

@@ -68,6 +68,7 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
                 .into(imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             imageView.setTransitionName("transition_image_" + position);
+            ((MovieHolder) holder).movieTitle.setTransitionName("transition_title_" + position);
         }
 
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());

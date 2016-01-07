@@ -27,3 +27,11 @@ proguard/
 *.log
 
 gradle.properties
+
+.idea/gradle.xml
+
+.idea/gradle.xml
+
+.idea/libraries/appcompat_v7_23_1_1.xml
+
+.idea/libraries/appcompat_v7_23_1_1.xml

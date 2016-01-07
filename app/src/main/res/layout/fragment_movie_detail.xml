@@ -10,12 +10,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ui.MovieDetailFragment">
 
+    <TextView
+        android:id="@+id/movieTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
     <ImageView
         android:id="@+id/movieImage"
         android:layout_width="96dp"
         android:layout_height="164dp"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/movieTitle"
         android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
         android:transitionName="@string/fragment_image_trans" />
