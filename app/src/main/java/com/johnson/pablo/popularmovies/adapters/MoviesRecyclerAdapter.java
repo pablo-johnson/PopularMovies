@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -24,7 +25,15 @@ import butterknife.ButterKnife;
 /**
  * Created by pablo on 12/8/15.
  */
-public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerAdapter.MovieHolder> {
+public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private final LayoutInflater mInflater;
+    @NonNull
+    protected List<Movie> mMovies;
+    @NonNull
+    private final Fragment mFragment;
+    @NonNull
+    private OnMovieClickListener mListener;
 
     public interface OnMovieClickListener {
         void onMovieClicked(@NonNull final Movie movie, View view, int position);
@@ -32,19 +41,10 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
         void onFavoredClicked(@NonNull final Movie movie, int position);
     }
 
-    @NonNull
-    private final Fragment mFragment;
-    @NonNull
-    private OnMovieClickListener mListener;
-
     public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies) {
-        super(fragment.getActivity(), movies == null ? new ArrayList<Movie>() : movies);
+        mMovies = movies;
         mFragment = fragment;
-    }
-
-    @Override
-    protected MovieHolder onCreateItemHolder(ViewGroup parent, int viewType) {
-        return new MovieHolder(mInflater.inflate(R.layout.item_movie_grid, parent, false));
+        mInflater = LayoutInflater.from(fragment.getContext());
     }
 
     @Override
@@ -72,6 +72,33 @@ public class MoviesRecyclerAdapter extends EndlessAdapter<Movie, MoviesRecyclerA
         }
 
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
+    }
+
+    @Override
+    public int getItemCount() {
+        return mMovies.size();
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new MovieHolder(mInflater.inflate(R.layout.item_movie_grid, parent, false));
+    }
+
+    public void clear() {
+        if (!mMovies.isEmpty()) {
+            mMovies.clear();
+            notifyDataSetChanged();
+        }
+    }
+
+    public void add(@NonNull List<Movie> newItems) {
+        if (!newItems.isEmpty()) {
+            int currentSize = mMovies.size();
+            int amountInserted = newItems.size();
+
+            mMovies.addAll(newItems);
+            notifyItemRangeInserted(currentSize, amountInserted);
+        }
     }
 
     public void setListener(@NonNull OnMovieClickListener listener) {

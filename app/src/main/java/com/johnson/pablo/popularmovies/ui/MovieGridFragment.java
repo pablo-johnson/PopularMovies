@@ -33,6 +33,8 @@ import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.MovieResponse;
 import com.johnson.pablo.popularmovies.models.Sort;
 
+import java.util.ArrayList;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import retrofit.Call;
@@ -108,7 +110,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), columnNumber);
         moviesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         moviesRecyclerView.setLayoutManager(mGridLayoutManager);
-        final MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MovieGridFragment.this, null);
+        final MoviesRecyclerAdapter moviesRecyclerAdapter = new MoviesRecyclerAdapter(MovieGridFragment.this, new ArrayList<Movie>());
         moviesRecyclerAdapter.setListener(this);
         moviesRecyclerView.addOnScrollListener(new EndlessScrollListener(mGridLayoutManager) {
             @Override
