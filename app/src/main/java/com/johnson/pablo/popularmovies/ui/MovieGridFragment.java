@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -161,7 +162,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     @Override
     public void onMovieClicked(@NonNull Movie movie, View view, int position) {
         ImageView movieImage = (ImageView) view.findViewById(R.id.movieImage);
-        TextView movieTitle = (TextView)view.findViewById(R.id.movieTitle);
+        TextView movieTitle = (TextView) view.findViewById(R.id.movieTitle);
 
         if (mListener.isTwoPanel()) {
             MovieDetailFragment detailMovieFragment = MovieDetailFragment.newInstance(movie);
@@ -192,10 +193,10 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 intent.putExtra("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
                 intent.putExtra("TITLE_TRANSITION_NAME", movieTitle.getTransitionName());
-                Pair<View, String> p1 = Pair.create((View)movieImage, movieImage.getTransitionName());
-                Pair<View, String> p2 = Pair.create((View)movieTitle, movieTitle.getTransitionName());
+                Pair<View, String> p1 = Pair.create((View) movieImage, movieImage.getTransitionName());
+                Pair<View, String> p2 = Pair.create((View) movieTitle, movieTitle.getTransitionName());
                 ActivityOptionsCompat options = makeSceneTransitionAnimation(getActivity(), p1, p2);
-                getActivity().startActivity(intent, options.toBundle());
+                ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
             } else {
                 startActivity(intent);
             }
