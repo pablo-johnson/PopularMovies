@@ -36,6 +36,8 @@ public class Movie implements Parcelable {
     private String originalLanguage;
     @SerializedName("video")
     private boolean hasVideo;
+    @SerializedName("homepage")
+    private String homepage;
 
     public Movie() {
     }
@@ -136,6 +138,14 @@ public class Movie implements Parcelable {
         this.voteCount = voteCount;
     }
 
+    public String getHomepage() {
+        return homepage;
+    }
+
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
+
     /**
      * Describe the kinds of special objects contained in this Parcelable's
      * marshalled representation.
@@ -169,6 +179,7 @@ public class Movie implements Parcelable {
         dest.writeString(this.originalTitle);
         dest.writeString(this.originalLanguage);
         dest.writeByte(hasVideo ? (byte) 1 : (byte) 0);
+        dest.writeString(this.homepage);
     }
 
     protected Movie(Parcel in) {
@@ -184,6 +195,7 @@ public class Movie implements Parcelable {
         this.originalTitle = in.readString();
         this.originalLanguage = in.readString();
         this.hasVideo = in.readByte() != 0;
+        this.homepage = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

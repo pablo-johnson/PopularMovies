@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="movie_poster_placeholder">#ffd32f2f</color>
+    <color name="black">@android:color/black</color>
 </resources>

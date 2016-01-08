@@ -8,7 +8,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.models.Movie;
@@ -26,6 +28,8 @@ public class MovieDetailActivity extends AppCompatActivity implements OnFragment
     Toolbar toolbar;
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
+    @Bind(R.id.toolbarImage)
+    ImageView toolbarImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +72,12 @@ public class MovieDetailActivity extends AppCompatActivity implements OnFragment
     }
 
     @Override
-    public void onFragmentInteraction() {
-
+    public void loadToolbarImage(String path) {
+        Glide.with(this)
+                .load(path)
+                .crossFade()
+                .placeholder(R.color.movie_poster_placeholder)
+                .into(toolbarImage);
     }
 
     @Override

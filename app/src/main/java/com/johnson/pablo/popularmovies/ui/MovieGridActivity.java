@@ -4,7 +4,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -57,18 +56,26 @@ public class MovieGridActivity extends AppCompatActivity implements OnFragmentIn
     }
 
     @Override
-    public void onFragmentInteraction() {
-
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
 
     @Override
+    public void loadToolbarImage(String path) {
+        /*IGNORE*/
+    }
+
+    @Override
     public boolean isTwoPanel() {
-        Log.e("Pablo", "mTwoPane " + mTwoPane);
         return mTwoPane;
+    }
+
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

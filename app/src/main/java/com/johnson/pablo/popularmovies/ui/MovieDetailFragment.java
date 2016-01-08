@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,8 +28,12 @@ public class MovieDetailFragment extends Fragment {
 
     @Bind(R.id.movieImage)
     ImageView movieImage;
-    @Bind(R.id.movieTitle)
-    TextView movieTitle;
+    @Bind(R.id.movieReleaseDate)
+    TextView movieReleaseDate;
+    @Bind(R.id.movieSynopsis)
+    TextView movieSynopsis;
+    @Bind(R.id.movieVoteAverage)
+    TextView movieVoteAverage;
 
     public MovieDetailFragment() {
         //setRetainInstance(true);
@@ -39,8 +42,7 @@ public class MovieDetailFragment extends Fragment {
     public static MovieDetailFragment newInstance(Movie movie) {
         MovieDetailFragment fragment = new MovieDetailFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("url", movie.getPosterPath());
-        bundle.putString("movieTitle", movie.getTitle());
+        bundle.putParcelable("movie", movie);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -76,15 +78,17 @@ public class MovieDetailFragment extends Fragment {
                 Bundle bundle = getArguments();
                 String imageTransitionName = bundle.getString("IMAGE_TRANSITION_NAME");
                 movieImage.setTransitionName(imageTransitionName);
-                String titleTransitionName = bundle.getString("TITLE_TRANSITION_NAME");
-                movieTitle.setTransitionName(titleTransitionName);
             }
-            movieTitle.setText(getArguments().getString("movieTitle"));
+            Movie movie = getArguments().getParcelable("movie");
             Glide.with(this)
-                    .load(getArguments().getString("url"))
+                    .load(movie.getPosterPath())
                     .crossFade()
                     .placeholder(R.color.movie_poster_placeholder)
                     .into(movieImage);
+            mListener.loadToolbarImage(movie.getBackDropPath());
+            movieSynopsis.setText(movie.getOverview());
+            movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
+            movieReleaseDate.setText(movie.getReleaseDate());
         }
         return contentView;
     }

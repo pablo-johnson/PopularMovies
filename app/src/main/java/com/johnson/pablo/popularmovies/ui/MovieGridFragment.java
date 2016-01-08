@@ -162,25 +162,20 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     @Override
     public void onMovieClicked(@NonNull Movie movie, View view, int position) {
         ImageView movieImage = (ImageView) view.findViewById(R.id.movieImage);
-        TextView movieTitle = (TextView) view.findViewById(R.id.movieTitle);
 
         if (mListener.isTwoPanel()) {
             MovieDetailFragment detailMovieFragment = MovieDetailFragment.newInstance(movie);
             Bundle bundle = detailMovieFragment.getArguments();
             FragmentTransaction ft = getFragmentManager().beginTransaction()
-                    .add(R.id.movieDetailContainer, detailMovieFragment);
+                    .replace(R.id.movieDetailContainer, detailMovieFragment);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
                 Transition changeTransform = TransitionInflater.from(getActivity()).inflateTransition(R.transition.change_image_transform);
-                Transition explodeTransform = TransitionInflater.from(getActivity()).inflateTransition(android.R.transition.explode);
 
                 // Setup exit transition on first fragment
                 setSharedElementReturnTransition(changeTransform);
-                setExitTransition(explodeTransform);
 
                 // Setup enter transition on second fragment
                 detailMovieFragment.setSharedElementEnterTransition(changeTransform);
-                detailMovieFragment.setEnterTransition(explodeTransform);
 
                 bundle.putString("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
 
@@ -192,10 +187,8 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
             intent.putExtra(MovieDetailActivity.MOVIE, movie);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 intent.putExtra("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
-                intent.putExtra("TITLE_TRANSITION_NAME", movieTitle.getTransitionName());
                 Pair<View, String> p1 = Pair.create((View) movieImage, movieImage.getTransitionName());
-                Pair<View, String> p2 = Pair.create((View) movieTitle, movieTitle.getTransitionName());
-                ActivityOptionsCompat options = makeSceneTransitionAnimation(getActivity(), p1, p2);
+                ActivityOptionsCompat options = makeSceneTransitionAnimation(getActivity(), p1);
                 ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
             } else {
                 startActivity(intent);
