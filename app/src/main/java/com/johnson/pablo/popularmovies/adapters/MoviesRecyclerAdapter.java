@@ -75,7 +75,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                     ((MovieHolder) holder).movieGenres.setTextColor(swatchPalette.getTitleTextColor());
                                 }
                             }
-                        })
+                        }))
                 .placeholder(R.color.movie_poster_placeholder)
                 .into(imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
