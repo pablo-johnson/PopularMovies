@@ -2,6 +2,8 @@ package com.johnson.pablo.popularmovies.ui;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,6 +36,7 @@ public class MovieDetailFragment extends Fragment {
     TextView movieSynopsis;
     @Bind(R.id.movieVoteAverage)
     TextView movieVoteAverage;
+    FloatingActionButton fabButton;
 
     public MovieDetailFragment() {
         //setRetainInstance(true);
@@ -90,6 +93,14 @@ public class MovieDetailFragment extends Fragment {
             movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
             movieReleaseDate.setText(movie.getReleaseDate());
         }
+        fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
         return contentView;
     }
 

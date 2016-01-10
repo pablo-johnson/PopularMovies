@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.github.florent37.glidepalette.BitmapPalette;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.models.Movie;
@@ -48,7 +50,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         final Movie movie = mMovies.get(position);
         ((MovieHolder) holder).movieContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,8 +64,18 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 .crossFade()
                 .listener(GlidePalette.with(movie.getPosterPath())
                         .use(GlidePalette.Profile.VIBRANT)
-                        .intoBackground(((MovieHolder) holder).movieTitle)
-                        .intoTextColor(((MovieHolder) holder).movieTitle))
+                        .intoCallBack(new BitmapPalette.CallBack() {
+                            @Override
+                            public void onPaletteLoaded(Palette palette) {
+                                Palette.Swatch swatchPalette = palette.getVibrantSwatch();
+                                if (swatchPalette != null) {
+                                    ((MovieHolder) holder).movieDataContainer
+                                            .setBackgroundColor(swatchPalette.getRgb());
+                                    ((MovieHolder) holder).movieTitle.setTextColor(swatchPalette.getTitleTextColor());
+                                    ((MovieHolder) holder).movieGenres.setTextColor(swatchPalette.getTitleTextColor());
+                                }
+                            }
+                        })
                 .placeholder(R.color.movie_poster_placeholder)
                 .into(imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -112,6 +124,10 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         TextView movieTitle;
         @Bind(R.id.movieItemContainer)
         View movieContainer;
+        @Bind(R.id.movieDataContainer)
+        View movieDataContainer;
+        @Bind(R.id.movieGenres)
+        TextView movieGenres;
 
 
         public MovieHolder(View itemView) {

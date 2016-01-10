@@ -1,4 +1,7 @@
-package com.johnson.pablo.popularmovies.models;
+package com.johnson.pablo.popularmovies.models.responses;
+
+import com.johnson.pablo.popularmovies.models.DateFilter;
+import com.johnson.pablo.popularmovies.models.Movie;
 
 import java.io.Serializable;
 import java.util.List;

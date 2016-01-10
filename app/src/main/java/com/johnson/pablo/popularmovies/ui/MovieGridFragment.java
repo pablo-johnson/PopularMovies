@@ -22,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
@@ -30,7 +29,7 @@ import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
 import com.johnson.pablo.popularmovies.models.Movie;
-import com.johnson.pablo.popularmovies.models.MovieResponse;
+import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
 import com.johnson.pablo.popularmovies.models.Sort;
 
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 
-import static android.support.v4.app.ActivityOptionsCompat.*;
+import static android.support.v4.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -54,7 +53,6 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     Sort defSort = Sort.fromString("popularity.desc");
 
     private int columnNumber;
-    private boolean mTwoPane;
     private OnFragmentInteractionListener mListener;
     private int mPage = 1;
     private String STATE_CURRENT_PAGE = "stateCurrentPage";
@@ -98,12 +96,6 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         ButterKnife.bind(this, contentView);
         setUpRecyclerView();
         return contentView;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mTwoPane = mListener.isTwoPanel();
     }
 
     private void setUpRecyclerView() {
@@ -162,41 +154,49 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     }
 
     @Override
-    public void onMovieClicked(@NonNull Movie movie, View view, int position) {
-        ImageView movieImage = (ImageView) view.findViewById(R.id.movieImage);
-
+    public void onMovieClicked(@NonNull Movie movie, View cardView, int position) {
         if (mListener.isTwoPanel()) {
-            MovieDetailFragment detailMovieFragment = MovieDetailFragment.newInstance(movie);
-            Bundle bundle = detailMovieFragment.getArguments();
-            FragmentTransaction ft = getFragmentManager().beginTransaction()
-                    .replace(R.id.movieDetailContainer, detailMovieFragment);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Transition changeTransform = TransitionInflater.from(getActivity()).inflateTransition(R.transition.change_image_transform);
-
-                // Setup exit transition on first fragment
-                setSharedElementReturnTransition(changeTransform);
-
-                // Setup enter transition on second fragment
-                detailMovieFragment.setSharedElementEnterTransition(changeTransform);
-
-                bundle.putString("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
-
-                ft.addSharedElement(movieImage, movieImage.getTransitionName());
-            }
-            ft.commit();
+            showDetailFragment(movie, cardView);
         } else {
-            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-            intent.putExtra(MovieDetailActivity.MOVIE, movie);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                intent.putExtra("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
-                Pair<View, String> p1 = Pair.create((View) movieImage, movieImage.getTransitionName());
-                ActivityOptionsCompat options = makeSceneTransitionAnimation(getActivity(), p1);
-                ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
-            } else {
-                startActivity(intent);
-            }
+            startDetailActivity(movie, cardView);
         }
+    }
 
+    private void showDetailFragment(@NonNull Movie movie, View cardView) {
+        getActivity().findViewById(R.id.fab).setVisibility(View.VISIBLE);
+        ImageView movieImage = (ImageView) cardView.findViewById(R.id.movieImage);
+        MovieDetailFragment detailMovieFragment = MovieDetailFragment.newInstance(movie);
+        Bundle bundle = detailMovieFragment.getArguments();
+        FragmentTransaction ft = getFragmentManager().beginTransaction()
+                .replace(R.id.movieDetailContainer, detailMovieFragment);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Transition changeTransform = TransitionInflater.from(getActivity()).inflateTransition(R.transition.change_image_transform);
+
+            // Setup exit transition on first fragment
+            setSharedElementReturnTransition(changeTransform);
+
+            // Setup enter transition on second fragment
+            detailMovieFragment.setSharedElementEnterTransition(changeTransform);
+
+            bundle.putString("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
+
+            ft.addSharedElement(movieImage, movieImage.getTransitionName());
+        }
+        ft.commit();
+    }
+
+    private void startDetailActivity(@NonNull Movie movie, View cardView) {
+        ImageView movieImage = (ImageView) cardView.findViewById(R.id.movieImage);
+        Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+        intent.putExtra(MovieDetailActivity.MOVIE, movie);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            intent.putExtra("IMAGE_TRANSITION_NAME", movieImage.getTransitionName());
+            Pair<View, String> p1 = Pair.create((View) movieImage, movieImage.getTransitionName());
+            ActivityOptionsCompat options = makeSceneTransitionAnimation(getActivity(), p1);
+            ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
+        } else {
+            startActivity(intent);
+        }
     }
 
     @Override
