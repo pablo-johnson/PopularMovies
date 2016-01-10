@@ -28,7 +28,7 @@ public class MovieApi {
 
     public MovieApiService getRetrofitService() {
         if (service == null) {
-            OkHttpClient client = OkHttpSingletonClass.getOkHttpClient();
+            OkHttpClient client = OkHttpSingleton.getOkHttpClient();
             //Add and interceptor to log all the requests and responses
             client.interceptors().add(new LoggingInterceptor());
             Retrofit retrofit = new Retrofit.Builder()

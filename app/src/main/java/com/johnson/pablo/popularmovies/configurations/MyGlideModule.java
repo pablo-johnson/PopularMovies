@@ -13,7 +13,7 @@ import com.bumptech.glide.load.model.stream.BaseGlideUrlLoader;
 import com.bumptech.glide.load.model.stream.StreamModelLoader;
 import com.bumptech.glide.module.GlideModule;
 import com.johnson.pablo.popularmovies.BuildConfig;
-import com.johnson.pablo.popularmovies.helpers.OkHttpSingletonClass;
+import com.johnson.pablo.popularmovies.helpers.OkHttpSingleton;
 
 import java.io.InputStream;
 
@@ -52,7 +52,7 @@ public class MyGlideModule implements GlideModule {
     @Override
     public void registerComponents(Context context, Glide glide) {
         glide.register(String.class, InputStream.class, new ImageLoader.Factory());
-        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(OkHttpSingletonClass.getOkHttpClient()));
+        glide.register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(OkHttpSingleton.getOkHttpClient()));
     }
 
     private static class ImageLoader extends BaseGlideUrlLoader<String> {
