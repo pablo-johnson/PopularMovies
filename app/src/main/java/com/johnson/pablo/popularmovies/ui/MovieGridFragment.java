@@ -63,8 +63,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     }
 
     public static MovieGridFragment newInstance() {
-        MovieGridFragment fragment = new MovieGridFragment();
-        return fragment;
+        return new MovieGridFragment();
     }
 
     @Override
@@ -94,11 +93,11 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         View contentView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         columnNumber = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) ? 2 : 3;
         ButterKnife.bind(this, contentView);
-        setUpRecyclerView();
+        setUpGridView();
         return contentView;
     }
 
-    private void setUpRecyclerView() {
+    private void setUpGridView() {
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), columnNumber);
         moviesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         moviesRecyclerView.setLayoutManager(mGridLayoutManager);
@@ -112,8 +111,6 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
             }
         });
         moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
-
-        getMovies(moviesRecyclerAdapter, mPage, defSort, false);
     }
 
     @Override
