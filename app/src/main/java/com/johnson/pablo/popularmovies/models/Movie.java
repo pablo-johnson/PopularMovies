@@ -34,6 +34,7 @@ public class Movie implements Parcelable {
     private String homepage;
     @SerializedName("genre_ids")
     int[] genres;
+    private transient String strGenres;
 
     public Movie() {
     }
@@ -150,6 +151,14 @@ public class Movie implements Parcelable {
         this.genres = genres;
     }
 
+    public String getStrGenres() {
+        return strGenres;
+    }
+
+    public void setStrGenres(String strGenres) {
+        this.strGenres = strGenres;
+    }
+
     /**
      * Describe the kinds of special objects contained in this Parcelable's
      * marshalled representation.
@@ -185,6 +194,7 @@ public class Movie implements Parcelable {
         dest.writeByte(hasVideo ? (byte) 1 : (byte) 0);
         dest.writeString(this.homepage);
         dest.writeIntArray(genres);
+        dest.writeString(strGenres);
     }
 
     protected Movie(Parcel in) {
@@ -201,7 +211,8 @@ public class Movie implements Parcelable {
         this.originalLanguage = in.readString();
         this.hasVideo = in.readByte() != 0;
         this.homepage = in.readString();
-        genres = in.createIntArray();
+        this.genres = in.createIntArray();
+        this.strGenres = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

@@ -38,6 +38,8 @@ public class MovieDetailFragment extends Fragment {
     TextView movieSynopsis;
     @Bind(R.id.movieVoteAverage)
     TextView movieVoteAverage;
+    @Bind(R.id.movieGenres)
+    TextView movieGenres;
     FloatingActionButton fabButton;
 
     public MovieDetailFragment() {
@@ -94,6 +96,7 @@ public class MovieDetailFragment extends Fragment {
             movieSynopsis.setText(movie.getOverview());
             movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
             movieReleaseDate.setText(movie.getReleaseDate());
+            movieGenres.setText(movie.getStrGenres());
         }
         fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fabButton.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +120,8 @@ public class MovieDetailFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override public void onDestroy() {
+    @Override
+    public void onDestroy() {
         super.onDestroy();
         RefWatcher refWatcher = PopularMoviesApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);

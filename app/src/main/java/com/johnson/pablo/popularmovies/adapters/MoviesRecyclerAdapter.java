@@ -20,6 +20,7 @@ import com.johnson.pablo.popularmovies.models.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -30,6 +31,7 @@ import butterknife.ButterKnife;
 public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final LayoutInflater mInflater;
+    private final Map<Integer, String> mGenresMap;
     @NonNull
     protected List<Movie> mMovies;
     @NonNull
@@ -43,10 +45,11 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         void onFavoredClicked(@NonNull final Movie movie, int position);
     }
 
-    public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies) {
+    public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies, Map<Integer, String> genresMap) {
         mMovies = movies;
         mFragment = fragment;
         mInflater = LayoutInflater.from(fragment.getContext());
+        mGenresMap = genresMap;
     }
 
     @Override
@@ -83,7 +86,16 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ((MovieHolder) holder).movieTitle.setTransitionName("transition_title_" + position);
         }
 
-        ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
+        if (movie.getStrGenres() == null) {
+            ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
+            StringBuilder genres = new StringBuilder();
+            for (int genreKey : movie.getGenres()) {
+                genres.append(mGenresMap.get(genreKey));
+                genres.append(", ");
+            }
+            movie.setStrGenres(genres.substring(0, genres.length() - 2));
+        }
+        ((MovieHolder) holder).movieGenres.setText(movie.getStrGenres());
     }
 
     @Override

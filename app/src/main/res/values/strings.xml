@@ -9,4 +9,5 @@
     <string name="synopsisLabel">Synopsis:</string>
     <string name="releaseDateLabel">Release Date:</string>
     <string name="voteAverageLabel">Vote Average:</string>
+    <string name="movieGenresLabel">Genres:</string>
 </resources>
