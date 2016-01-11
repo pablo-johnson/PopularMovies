@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Created by pablo on 12/7/15.
  */
@@ -35,6 +37,8 @@ public class Movie implements Parcelable {
     @SerializedName("genre_ids")
     int[] genres;
     private transient String strGenres;
+    private List<Video> videos;
+    private List<Review> reviews;
 
     public Movie() {
     }
@@ -159,25 +163,27 @@ public class Movie implements Parcelable {
         this.strGenres = strGenres;
     }
 
-    /**
-     * Describe the kinds of special objects contained in this Parcelable's
-     * marshalled representation.
-     *
-     * @return a bitmask indicating the set of special object types marshalled
-     * by the Parcelable.
-     */
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
-    /**
-     * Flatten this object in to a Parcel.
-     *
-     * @param dest  The Parcel in which the object should be written.
-     * @param flags Additional flags about how the object should be written.
-     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
-     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
@@ -195,6 +201,8 @@ public class Movie implements Parcelable {
         dest.writeString(this.homepage);
         dest.writeIntArray(genres);
         dest.writeString(strGenres);
+        dest.writeList(videos);
+        dest.writeList(reviews);
     }
 
     protected Movie(Parcel in) {
@@ -213,6 +221,8 @@ public class Movie implements Parcelable {
         this.homepage = in.readString();
         this.genres = in.createIntArray();
         this.strGenres = in.readString();
+        this.videos = in.readArrayList(null);
+        this.reviews = in.readArrayList(null);
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

@@ -31,14 +31,13 @@ import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
 import com.johnson.pablo.popularmovies.models.Genre;
 import com.johnson.pablo.popularmovies.models.Movie;
+import com.johnson.pablo.popularmovies.models.Sort;
 import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
 import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
-import com.johnson.pablo.popularmovies.models.Sort;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -152,6 +151,9 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     public void onPause() {
         if (callMovies != null) {
             callMovies.cancel();
+        }
+        if (callGenres != null) {
+            callGenres.cancel();
         }
         super.onPause();
     }

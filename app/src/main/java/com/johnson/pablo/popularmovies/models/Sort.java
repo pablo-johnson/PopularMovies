@@ -9,7 +9,8 @@ public enum Sort implements Serializable {
 
     POPULARITY("popularity.desc", "Popularity"),
     VOTE_AVERAGE("vote_average.desc", "Vote Average"),
-    VOTE_COUNT("vote_count.desc", "Vote Count");
+    VOTE_COUNT("vote_count.desc", "Vote Count"),
+    FAVORITES("favorites", "Favorites");
 
     private final String value;
     private final String displayValue;
@@ -24,7 +25,7 @@ public enum Sort implements Serializable {
         return value;
     }
 
-    public String getDisplayValue(){
+    public String getDisplayValue() {
         return displayValue;
     }
 

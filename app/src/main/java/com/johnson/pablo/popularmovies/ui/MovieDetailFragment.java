@@ -16,12 +16,20 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.johnson.pablo.popularmovies.PopularMoviesApplication;
 import com.johnson.pablo.popularmovies.R;
+import com.johnson.pablo.popularmovies.helpers.MovieApi;
+import com.johnson.pablo.popularmovies.interfaces.MovieApiService;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.models.Movie;
+import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
+import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
+import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
 import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -41,6 +49,8 @@ public class MovieDetailFragment extends Fragment {
     @Bind(R.id.movieGenres)
     TextView movieGenres;
     FloatingActionButton fabButton;
+    private Call<VideoResponse> callVideos;
+    private Call<ReviewResponse> callReviews;
 
     public MovieDetailFragment() {
         //setRetainInstance(true);
@@ -80,24 +90,32 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, contentView);
-        if (getArguments() != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Bundle bundle = getArguments();
-                String imageTransitionName = bundle.getString("IMAGE_TRANSITION_NAME");
-                movieImage.setTransitionName(imageTransitionName);
+        final Movie movie = getArguments().getParcelable("movie");
+        callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
+        callVideos.enqueue(new Callback<VideoResponse>() {
+            @Override
+            public void onResponse(Response<VideoResponse> response) {
+                movie.setVideos(response.body().getResults());
             }
-            Movie movie = getArguments().getParcelable("movie");
-            Glide.with(this)
-                    .load(movie.getPosterPath())
-                    .crossFade()
-                    .placeholder(R.color.movie_poster_placeholder)
-                    .into(movieImage);
-            mListener.loadToolbarImage(movie.getBackDropPath());
-            movieSynopsis.setText(movie.getOverview());
-            movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
-            movieReleaseDate.setText(movie.getReleaseDate());
-            movieGenres.setText(movie.getStrGenres());
-        }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+        callReviews = MovieApi.get().getRetrofitService().getMovieReviews(movie.getId());
+        callReviews.enqueue(new Callback<ReviewResponse>() {
+            @Override
+            public void onResponse(Response<ReviewResponse> response) {
+                movie.setReviews(response.body().getResults());
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+        setUpUI(movie);
         fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fabButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +127,24 @@ public class MovieDetailFragment extends Fragment {
         return contentView;
     }
 
+    private void setUpUI(Movie movie) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Bundle bundle = getArguments();
+            String imageTransitionName = bundle.getString("IMAGE_TRANSITION_NAME");
+            movieImage.setTransitionName(imageTransitionName);
+        }
+        Glide.with(this)
+                .load(movie.getPosterPath())
+                .crossFade()
+                .placeholder(R.color.movie_poster_placeholder)
+                .into(movieImage);
+        mListener.loadToolbarImage(movie.getBackDropPath());
+        movieSynopsis.setText(movie.getOverview());
+        movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
+        movieReleaseDate.setText(movie.getReleaseDate());
+        movieGenres.setText(movie.getStrGenres());
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -118,6 +154,17 @@ public class MovieDetailFragment extends Fragment {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPause() {
+        if (callVideos != null) {
+            callVideos.cancel();
+        }
+        if (callReviews != null) {
+            callReviews.cancel();
+        }
+        super.onPause();
     }
 
     @Override
