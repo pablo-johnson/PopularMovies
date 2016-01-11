@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import retrofit.http.Field;
 
@@ -38,6 +39,8 @@ public class Movie implements Parcelable {
     private boolean hasVideo;
     @SerializedName("homepage")
     private String homepage;
+    @SerializedName("genre_ids")
+    int[] genres;
 
     public Movie() {
     }
@@ -146,6 +149,14 @@ public class Movie implements Parcelable {
         this.homepage = homepage;
     }
 
+    public int[] getGenres() {
+        return genres;
+    }
+
+    public void setGenres(int[] genres) {
+        this.genres = genres;
+    }
+
     /**
      * Describe the kinds of special objects contained in this Parcelable's
      * marshalled representation.
@@ -180,6 +191,7 @@ public class Movie implements Parcelable {
         dest.writeString(this.originalLanguage);
         dest.writeByte(hasVideo ? (byte) 1 : (byte) 0);
         dest.writeString(this.homepage);
+        dest.writeIntArray(genres);
     }
 
     protected Movie(Parcel in) {
@@ -196,6 +208,7 @@ public class Movie implements Parcelable {
         this.originalLanguage = in.readString();
         this.hasVideo = in.readByte() != 0;
         this.homepage = in.readString();
+        genres = in.createIntArray();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
