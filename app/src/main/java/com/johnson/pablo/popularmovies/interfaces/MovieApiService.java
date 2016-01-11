@@ -4,9 +4,12 @@ import com.johnson.pablo.popularmovies.BuildConfig;
 import com.johnson.pablo.popularmovies.models.Sort;
 import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
 import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
+import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
+import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
 
 import retrofit.Call;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -18,4 +21,10 @@ public interface MovieApiService {
 
     @GET("genre/movie/list?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
     Call<GenreResponse> getMovieGenres();
+
+    @GET("movie/{movieId}/videos?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
+    Call<VideoResponse> getMovieVideos(@Path("movieId") String movieId);
+
+    @GET("movie/{movieId}/reviews?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
+    Call<ReviewResponse> getMovieReviews(@Path("movieId") String movieId);
 }
