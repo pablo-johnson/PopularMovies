@@ -29,12 +29,16 @@ import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
+import com.johnson.pablo.popularmovies.models.Genre;
 import com.johnson.pablo.popularmovies.models.Movie;
+import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
 import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
 import com.johnson.pablo.popularmovies.models.Sort;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -50,6 +54,7 @@ import static android.support.v4.app.ActivityOptionsCompat.makeSceneTransitionAn
 public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter.OnMovieClickListener {
 
     private Call<MovieResponse> callMovies;
+    private Call<GenreResponse> callGenres;
     @Bind(R.id.moviesGrid)
     RecyclerView moviesRecyclerView;
     Sort defSort = Sort.fromString("popularity.desc");
@@ -59,6 +64,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     private int mPage = 1;
     private String STATE_CURRENT_PAGE = "stateCurrentPage";
     private String STATE_CURRENT_SORT = "stateCurrentSort";
+    private HashMap<Integer, String> genresMap;
 
 
     public MovieGridFragment() {
@@ -71,6 +77,26 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        genresMap = new HashMap<>();
+        callGenres = MovieApi.get().getRetrofitService().getMovieGenres();
+        callGenres.enqueue(new Callback<GenreResponse>() {
+            @Override
+            public void onResponse(Response<GenreResponse> response) {
+                for (Genre genre : response.body().getGenres()) {
+                    genresMap.put(genre.getId(), genre.getName());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e("Pablo", t.getLocalizedMessage());
+            }
+        });
     }
 
     @Override
@@ -138,7 +164,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         if (clearMovies) {
             adapter.clear();
         }
-        callMovies = MovieApi.get().getRetrofitService().getTopRated(page, sort);
+        callMovies = MovieApi.get().getRetrofitService().discoverMovies(page, sort);
         callMovies.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Response<MovieResponse> response) {
@@ -215,7 +241,8 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         outState.putInt(STATE_CURRENT_PAGE, mPage);
     }
 
-    @Override public void onDestroy() {
+    @Override
+    public void onDestroy() {
         super.onDestroy();
         RefWatcher refWatcher = PopularMoviesApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);

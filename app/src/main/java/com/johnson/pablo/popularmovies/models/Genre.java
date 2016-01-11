@@ -9,7 +9,7 @@ import android.os.Parcelable;
 public class Genre implements Parcelable {
 
     private int id;
-    private int name;
+    private String name;
 
     public int getId() {
         return id;
@@ -19,17 +19,17 @@ public class Genre implements Parcelable {
         this.id = id;
     }
 
-    public int getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(int name) {
+    public void setName(String name) {
         this.name = name;
     }
 
     protected Genre(Parcel in) {
         id = in.readInt();
-        name = in.readInt();
+        name = in.readString();
     }
 
     public static final Creator<Genre> CREATOR = new Creator<Genre>() {
@@ -52,6 +52,6 @@ public class Genre implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
-        dest.writeInt(name);
+        dest.writeString(name);
     }
 }

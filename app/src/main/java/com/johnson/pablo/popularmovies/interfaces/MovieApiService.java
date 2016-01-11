@@ -14,8 +14,8 @@ import retrofit.http.Query;
  */
 public interface MovieApiService {
     @GET("discover/movie?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
-    Call<MovieResponse> getTopRated(@Query("page") int page, @Query("sort_by") Sort sort);
+    Call<MovieResponse> discoverMovies(@Query("page") int page, @Query("sort_by") Sort sort);
 
-    @GET("/genre/movie/list")
-    Call<GenreResponse> genres();
+    @GET("genre/movie/list?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
+    Call<GenreResponse> getMovieGenres();
 }

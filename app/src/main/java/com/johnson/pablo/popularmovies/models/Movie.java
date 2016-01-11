@@ -5,13 +5,6 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import retrofit.http.Field;
-
 /**
  * Created by pablo on 12/7/15.
  */
