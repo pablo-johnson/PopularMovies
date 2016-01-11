@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.johnson.pablo.popularmovies.PopularMoviesApplication;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
@@ -31,6 +32,7 @@ import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
 import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
 import com.johnson.pablo.popularmovies.models.Sort;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 
@@ -211,5 +213,11 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         super.onSaveInstanceState(outState);
         outState.putSerializable(STATE_CURRENT_SORT, defSort);
         outState.putInt(STATE_CURRENT_PAGE, mPage);
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = PopularMoviesApplication.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 }

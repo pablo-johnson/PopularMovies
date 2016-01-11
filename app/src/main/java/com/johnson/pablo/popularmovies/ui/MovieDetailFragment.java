@@ -14,9 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.johnson.pablo.popularmovies.PopularMoviesApplication;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.models.Movie;
+import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -113,5 +115,11 @@ public class MovieDetailFragment extends Fragment {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = PopularMoviesApplication.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 }
