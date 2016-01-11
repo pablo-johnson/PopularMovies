@@ -3,6 +3,7 @@ package com.johnson.pablo.popularmovies.helpers;
 import com.johnson.pablo.popularmovies.BuildConfig;
 import com.johnson.pablo.popularmovies.interfaces.MovieApiService;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
@@ -29,8 +30,10 @@ public class MovieApi {
     public MovieApiService getRetrofitService() {
         if (service == null) {
             OkHttpClient client = OkHttpSingleton.getOkHttpClient();
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             //Add and interceptor to log all the requests and responses
-            client.interceptors().add(new LoggingInterceptor());
+            client.interceptors().add(interceptor);
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BuildConfig.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
