@@ -1,4 +1,5 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -100,6 +101,17 @@
             android:layout_below="@id/synopsisLabel"
             android:layout_marginTop="10dp"
             android:textColor="@color/black" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/reviewsGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/movieSynopsis"
+            android:scrollbars="none"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:context=".ui.MovieDetailFragment"
+            tools:listitem="@layout/item_movie_grid"
+            tools:showIn="@layout/fragment_movie_detail" />
 
     </RelativeLayout>
 

@@ -86,7 +86,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ((MovieHolder) holder).movieTitle.setTransitionName("transition_title_" + position);
         }
 
-        if (movie.getStrGenres() == null) {
+        if ((movie.getStrGenres() == null) && (movie.getGenres().length > 0)) {
             ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
             StringBuilder genres = new StringBuilder();
             for (int genreKey : movie.getGenres()) {

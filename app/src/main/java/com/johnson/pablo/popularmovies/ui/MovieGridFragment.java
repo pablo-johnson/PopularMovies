@@ -142,12 +142,6 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
     public void onPause() {
         if (callMovies != null) {
             callMovies.cancel();

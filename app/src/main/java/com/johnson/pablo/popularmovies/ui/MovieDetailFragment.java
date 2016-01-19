@@ -6,6 +6,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,14 +19,17 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.johnson.pablo.popularmovies.PopularMoviesApplication;
 import com.johnson.pablo.popularmovies.R;
+import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
+import com.johnson.pablo.popularmovies.adapters.ReviewsAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
-import com.johnson.pablo.popularmovies.interfaces.MovieApiService;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
+import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
 import com.johnson.pablo.popularmovies.models.Movie;
-import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
 import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
 import com.squareup.leakcanary.RefWatcher;
+
+import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -48,6 +54,8 @@ public class MovieDetailFragment extends Fragment {
     TextView movieVoteAverage;
     @Bind(R.id.movieGenres)
     TextView movieGenres;
+    @Bind(R.id.reviewsGrid)
+    RecyclerView reviewsList;
     FloatingActionButton fabButton;
     private Call<VideoResponse> callVideos;
     private Call<ReviewResponse> callReviews;
@@ -91,6 +99,42 @@ public class MovieDetailFragment extends Fragment {
         View contentView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, contentView);
         final Movie movie = getArguments().getParcelable("movie");
+        setupCalls(movie);
+        setUpUI(movie);
+        setupReviewRecyclerView(movie);
+        fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+        return contentView;
+    }
+
+    private void setupReviewRecyclerView(final Movie movie) {
+
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        reviewsList.setItemAnimator(new DefaultItemAnimator());
+        reviewsList.setLayoutManager(mLinearLayoutManager);
+
+        callReviews = MovieApi.get().getRetrofitService().getMovieReviews(movie.getId());
+        callReviews.enqueue(new Callback<ReviewResponse>() {
+            @Override
+            public void onResponse(Response<ReviewResponse> response) {
+                movie.setReviews(response.body().getResults());
+                reviewsList.setAdapter(new ReviewsAdapter(getContext(), response.body().getResults()));
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+    }
+
+    private void setupCalls(final Movie movie) {
         callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
         callVideos.enqueue(new Callback<VideoResponse>() {
             @Override
@@ -103,28 +147,6 @@ public class MovieDetailFragment extends Fragment {
 
             }
         });
-        callReviews = MovieApi.get().getRetrofitService().getMovieReviews(movie.getId());
-        callReviews.enqueue(new Callback<ReviewResponse>() {
-            @Override
-            public void onResponse(Response<ReviewResponse> response) {
-                movie.setReviews(response.body().getResults());
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-
-            }
-        });
-        setUpUI(movie);
-        fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fabButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        return contentView;
     }
 
     private void setUpUI(Movie movie) {
