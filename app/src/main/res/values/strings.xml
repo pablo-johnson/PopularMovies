@@ -10,4 +10,5 @@
     <string name="releaseDateLabel">Release Date:</string>
     <string name="voteAverageLabel">Vote Average:</string>
     <string name="movieGenresLabel">Genres:</string>
+    <string name="reviewsLabel">Reviews:</string>
 </resources>

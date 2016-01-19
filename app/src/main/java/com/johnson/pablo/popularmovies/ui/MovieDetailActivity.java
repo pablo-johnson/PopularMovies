@@ -57,18 +57,19 @@ public class MovieDetailActivity extends AppCompatActivity implements OnFragment
             }
         }
 
-        if (collapsingToolbarLayout!=null){
+        if (collapsingToolbarLayout != null) {
             collapsingToolbarLayout.setTitle(movie.getTitle());
         }
 
-
-        MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance(movie);
-        Bundle bundle = movieDetailFragment.getArguments();
-        bundle.putAll(getIntent().getExtras());
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment, movieDetailFragment)
-                .commit();
+        if (savedInstanceState == null) {
+            MovieDetailFragment movieDetailFragment = MovieDetailFragment.newInstance(movie);
+            Bundle bundle = movieDetailFragment.getArguments();
+            bundle.putAll(getIntent().getExtras());
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment, movieDetailFragment)
+                    .commit();
+        }
     }
 
     @Override

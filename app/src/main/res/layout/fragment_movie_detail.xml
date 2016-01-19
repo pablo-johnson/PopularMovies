@@ -1,5 +1,4 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -19,6 +18,8 @@
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="10dp"
             android:adjustViewBounds="true"
@@ -30,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
+            android:layout_toEndOf="@id/movieImage"
             android:layout_toRightOf="@id/movieImage"
             android:text="@string/releaseDateLabel"
             android:textColor="@color/black"
@@ -41,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/releaseDateLabel"
             android:layout_marginTop="2dp"
+            android:layout_toEndOf="@id/movieImage"
             android:layout_toRightOf="@id/movieImage"
             android:textColor="@color/black" />
 
@@ -50,6 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/movieReleaseDate"
             android:layout_marginTop="15dp"
+            android:layout_toEndOf="@id/movieImage"
             android:layout_toRightOf="@id/movieImage"
             android:text="@string/movieGenresLabel"
             android:textColor="@color/black"
@@ -61,6 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/genresLabel"
             android:layout_marginTop="2dp"
+            android:layout_toEndOf="@id/movieImage"
             android:layout_toRightOf="@id/movieImage"
             android:textColor="@color/black" />
 
@@ -70,6 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/movieGenres"
             android:layout_marginTop="15dp"
+            android:layout_toEndOf="@id/movieImage"
             android:layout_toRightOf="@id/movieImage"
             android:text="@string/voteAverageLabel"
             android:textColor="@color/black"
@@ -81,6 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/voteAverageLabel"
             android:layout_marginTop="2dp"
+            android:layout_toEndOf="@id/movieImage"
             android:layout_toRightOf="@id/movieImage"
             android:textColor="@color/black" />
 
@@ -100,18 +107,26 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/synopsisLabel"
             android:layout_marginTop="10dp"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            tools:text="Ipsum dolorem" />
+
+        <TextView
+            android:id="@+id/reviewsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/movieSynopsis"
+            android:layout_marginTop="20dp"
+            android:text="@string/reviewsLabel"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/reviewsGrid"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/movieSynopsis"
-            android:scrollbars="none"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:context=".ui.MovieDetailFragment"
-            tools:listitem="@layout/item_movie_grid"
-            tools:showIn="@layout/fragment_movie_detail" />
+            android:layout_height="400dp"
+            android:layout_below="@id/reviewsLabel"
+            android:layout_marginTop="10dp"
+            android:scrollbars="none" />
 
     </RelativeLayout>
 

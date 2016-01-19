@@ -24,6 +24,7 @@ import com.johnson.pablo.popularmovies.adapters.ReviewsAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
+import com.johnson.pablo.popularmovies.managers.MyLinearLayoutManager;
 import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
 import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
@@ -114,17 +115,19 @@ public class MovieDetailFragment extends Fragment {
     }
 
     private void setupReviewRecyclerView(final Movie movie) {
-
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        reviewsList.setItemAnimator(new DefaultItemAnimator());
-        reviewsList.setLayoutManager(mLinearLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        reviewsList.setLayoutManager(linearLayoutManager);
+        final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(getActivity(), null);
+        reviewsList.setAdapter(reviewsAdapter);
 
         callReviews = MovieApi.get().getRetrofitService().getMovieReviews(movie.getId());
         callReviews.enqueue(new Callback<ReviewResponse>() {
             @Override
             public void onResponse(Response<ReviewResponse> response) {
-                movie.setReviews(response.body().getResults());
-                reviewsList.setAdapter(new ReviewsAdapter(getContext(), response.body().getResults()));
+                if (response != null && response.body() != null && response.body().getResults() != null) {
+                    movie.setReviews(response.body().getResults());
+                    reviewsAdapter.addReviews(response.body().getResults());
+                }
             }
 
             @Override
@@ -139,7 +142,9 @@ public class MovieDetailFragment extends Fragment {
         callVideos.enqueue(new Callback<VideoResponse>() {
             @Override
             public void onResponse(Response<VideoResponse> response) {
-                movie.setVideos(response.body().getResults());
+                if (response.body() != null && response.body().getResults() != null) {
+                    movie.setVideos(response.body().getResults());
+                }
             }
 
             @Override

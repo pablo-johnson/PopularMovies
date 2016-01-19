@@ -21,13 +21,11 @@ import butterknife.ButterKnife;
  * @author Pablo Johnson
  */
 public class ReviewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final Context mContext;
     private List<Review> mItemList;
     private final LayoutInflater mInflater;
 
     public ReviewsAdapter(Context context, List<Review> itemList) {
         mItemList = itemList;
-        mContext = context;
         mInflater = LayoutInflater.from(context);
     }
 
@@ -38,13 +36,10 @@ public class ReviewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if (position > 0) {
-            ReviewHolder holder = (ReviewHolder) viewHolder;
-            final Review review = mItemList.get(position);
-            holder.author.setText(review.getAuthor());
-            holder.content.setText(review.getContent());
-
-        }
+        ReviewHolder holder = (ReviewHolder) viewHolder;
+        final Review review = mItemList.get(position);
+        holder.author.setText(review.getAuthor());
+        holder.content.setText(review.getContent());
     }
 
     @Override
@@ -54,9 +49,6 @@ public class ReviewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
-            return 0;
-        }
         return 1;
     }
 
@@ -70,6 +62,15 @@ public class ReviewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public void addReviews(List<Review> reviews) {
+        if (mItemList == null) {
+            mItemList = reviews;
+        } else {
+            mItemList.addAll(reviews);
+        }
+        notifyDataSetChanged();
     }
 
 }
