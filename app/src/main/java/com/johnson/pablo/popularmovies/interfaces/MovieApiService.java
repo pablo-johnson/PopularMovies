@@ -25,6 +25,9 @@ public interface MovieApiService {
     @GET("movie/{movieId}/videos?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
     Call<VideoResponse> getMovieVideos(@Path("movieId") long movieId);
 
-    @GET("movie/{movieId}/reviews?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
-    Call<ReviewResponse> getMovieReviews(@Path("movieId") long movieId);
+    @GET("movie/{movieID}/reviews?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
+    Call<ReviewResponse> getMovieReviews(@Path("movieID") long movieID);
+
+    @GET("movie/{id}/reviews?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
+    Call<ReviewResponse> getReviews(@Path("id") int id);
 }

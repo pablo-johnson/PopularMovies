@@ -1,14 +1,15 @@
 package com.johnson.pablo.popularmovies.ui;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,20 +18,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.johnson.pablo.popularmovies.PopularMoviesApplication;
 import com.johnson.pablo.popularmovies.R;
-import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.adapters.ReviewsAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
-import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
-import com.johnson.pablo.popularmovies.managers.MyLinearLayoutManager;
 import com.johnson.pablo.popularmovies.models.Movie;
+import com.johnson.pablo.popularmovies.models.Review;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
 import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
-import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -55,11 +53,13 @@ public class MovieDetailFragment extends Fragment {
     TextView movieVoteAverage;
     @Bind(R.id.movieGenres)
     TextView movieGenres;
-    @Bind(R.id.reviewsGrid)
-    RecyclerView reviewsList;
+    @Bind(R.id.reviewsList)
+    RecyclerView reviewsListView;
     FloatingActionButton fabButton;
     private Call<VideoResponse> callVideos;
     private Call<ReviewResponse> callReviews;
+    private ArrayList<Object> trailersList;
+    private List<Review> reviewsList;
 
     public MovieDetailFragment() {
         //setRetainInstance(true);
@@ -76,6 +76,17 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        trailersList = new ArrayList<>();
+        reviewsList = new ArrayList<>();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        final Movie movie = getArguments().getParcelable("movie");
+        setUpUI(movie);
+        //setupCalls(movie);
+        setupReviewRecyclerView(movie);
     }
 
     @Override
@@ -99,10 +110,7 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, contentView);
-        final Movie movie = getArguments().getParcelable("movie");
-        setupCalls(movie);
-        setUpUI(movie);
-        setupReviewRecyclerView(movie);
+
         fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fabButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,17 +124,23 @@ public class MovieDetailFragment extends Fragment {
 
     private void setupReviewRecyclerView(final Movie movie) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        reviewsList.setLayoutManager(linearLayoutManager);
+        reviewsListView.setLayoutManager(linearLayoutManager);
         final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(getActivity(), null);
-        reviewsList.setAdapter(reviewsAdapter);
+        reviewsListView.setAdapter(reviewsAdapter);
 
-        callReviews = MovieApi.get().getRetrofitService().getMovieReviews(movie.getId());
+        int id = movie.getId();
+        Log.e("Rasho", id + "");
+        callReviews = MovieApi.get().getRetrofitService().getReviews(id);
         callReviews.enqueue(new Callback<ReviewResponse>() {
             @Override
             public void onResponse(Response<ReviewResponse> response) {
                 if (response != null && response.body() != null && response.body().getResults() != null) {
-                    movie.setReviews(response.body().getResults());
-                    reviewsAdapter.addReviews(response.body().getResults());
+                    reviewsList = response.body().getResults();
+                    movie.setReviews(reviewsList);
+                    ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
+                    lp.height = (int) (103 * Resources.getSystem().getDisplayMetrics().density * reviewsList.size());
+                    reviewsListView.setLayoutParams(lp);
+                    reviewsAdapter.addReviews(reviewsList);
                 }
             }
 
@@ -197,7 +211,5 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        RefWatcher refWatcher = PopularMoviesApplication.getRefWatcher(getActivity());
-        refWatcher.watch(this);
     }
 }

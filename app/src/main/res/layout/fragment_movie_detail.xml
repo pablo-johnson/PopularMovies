@@ -121,9 +121,9 @@
             android:textStyle="bold" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/reviewsGrid"
+            android:id="@+id/reviewsList"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="wrap_content"
             android:layout_below="@id/reviewsLabel"
             android:layout_marginTop="10dp"
             android:scrollbars="none" />

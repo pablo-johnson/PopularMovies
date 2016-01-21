@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Movie implements Parcelable {
 
-    private long id;
+    private int id;
     private String overview;
     @SerializedName("release_date")
     private String releaseDate;
@@ -123,11 +123,11 @@ public class Movie implements Parcelable {
         this.voteAverage = voteAverage;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -186,7 +186,7 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.id);
+        dest.writeInt(this.id);
         dest.writeString(this.overview);
         dest.writeString(this.releaseDate);
         dest.writeString(this.posterPath);
@@ -206,7 +206,7 @@ public class Movie implements Parcelable {
     }
 
     protected Movie(Parcel in) {
-        this.id = in.readLong();
+        this.id = in.readInt();
         this.overview = in.readString();
         this.releaseDate = in.readString();
         this.posterPath = in.readString();
