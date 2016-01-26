@@ -29,6 +29,11 @@
             android:name=".ui.MovieDetailActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <provider
+            android:name="com.johnson.pablo.popularmovies.models.data.generated.PopularMoviesProvider"
+            android:authorities="com.johnson.pablo.popularmovies.models.data.PopularMoviesProvider"
+            android:exported="false" />
     </application>
 
 </manifest>

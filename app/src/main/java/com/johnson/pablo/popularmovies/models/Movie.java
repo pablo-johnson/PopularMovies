@@ -37,6 +37,7 @@ public class Movie implements Parcelable {
     @SerializedName("genre_ids")
     int[] genres;
     private transient String strGenres;
+    private transient String favoriteAddedDate;
     private List<Video> videos;
     private List<Review> reviews;
 
@@ -163,6 +164,14 @@ public class Movie implements Parcelable {
         this.strGenres = strGenres;
     }
 
+    public String getFavoriteAddedDate() {
+        return favoriteAddedDate;
+    }
+
+    public void setFavoriteAddedDate(String favoriteAddedDate) {
+        this.favoriteAddedDate = favoriteAddedDate;
+    }
+
     public List<Video> getVideos() {
         return videos;
     }
@@ -203,6 +212,7 @@ public class Movie implements Parcelable {
         dest.writeString(strGenres);
         dest.writeList(videos);
         dest.writeList(reviews);
+        dest.writeString(favoriteAddedDate);
     }
 
     protected Movie(Parcel in) {
@@ -223,6 +233,7 @@ public class Movie implements Parcelable {
         this.strGenres = in.readString();
         this.videos = in.readArrayList(null);
         this.reviews = in.readArrayList(null);
+        this.favoriteAddedDate = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

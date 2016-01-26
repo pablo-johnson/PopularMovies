@@ -3,6 +3,7 @@ package com.johnson.pablo.popularmovies.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -26,18 +30,21 @@ import android.widget.ImageView;
 import com.johnson.pablo.popularmovies.PopularMoviesApplication;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
+import com.johnson.pablo.popularmovies.helpers.DataBaseHelper;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.listeners.EndlessScrollListener;
 import com.johnson.pablo.popularmovies.models.Genre;
 import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.Sort;
+import com.johnson.pablo.popularmovies.models.data.PopularMoviesProvider;
 import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
 import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -50,8 +57,9 @@ import static android.support.v4.app.ActivityOptionsCompat.makeSceneTransitionAn
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter.OnMovieClickListener {
+public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter.OnMovieClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int CURSOR_LOADER_ID = 0;
     private Call<MovieResponse> callMovies;
     private Call<GenreResponse> callGenres;
     @Bind(R.id.moviesGrid)
@@ -64,6 +72,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     private String STATE_CURRENT_PAGE = "stateCurrentPage";
     private String STATE_CURRENT_SORT = "stateCurrentSort";
     private HashMap<Integer, String> genresMap;
+    private MoviesRecyclerAdapter moviesRecyclerAdapter;
 
 
     public MovieGridFragment() {
@@ -128,14 +137,15 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), columnNumber);
         moviesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         moviesRecyclerView.setLayoutManager(mGridLayoutManager);
-        final MoviesRecyclerAdapter moviesRecyclerAdapter
-                = new MoviesRecyclerAdapter(MovieGridFragment.this, new ArrayList<Movie>(), genresMap);
+        moviesRecyclerAdapter = new MoviesRecyclerAdapter(MovieGridFragment.this, new ArrayList<Movie>(), genresMap);
         moviesRecyclerAdapter.setListener(this);
         moviesRecyclerView.addOnScrollListener(new EndlessScrollListener(mGridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                getMovies(moviesRecyclerAdapter, ++page, defSort, false);
-                mPage = page;
+                if (!Sort.FAVORITES.name().equals(defSort.name())) {
+                    getMovies(moviesRecyclerAdapter, ++page, defSort, false);
+                    mPage = page;
+                }
             }
         });
         moviesRecyclerView.setAdapter(moviesRecyclerAdapter);
@@ -158,21 +168,25 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     }
 
     private void getMovies(final MoviesRecyclerAdapter adapter, int page, Sort sort, boolean clearMovies) {
-        if (clearMovies) {
-            adapter.clear();
-        }
-        callMovies = MovieApi.get().getRetrofitService().discoverMovies(page, sort);
-        callMovies.enqueue(new Callback<MovieResponse>() {
-            @Override
-            public void onResponse(Response<MovieResponse> response) {
-                adapter.add(response.body().getResults());
+        if (!Sort.FAVORITES.name().equals(sort.name())) {
+            if (clearMovies) {
+                adapter.clear();
             }
+            callMovies = MovieApi.get().getRetrofitService().discoverMovies(page, sort);
+            callMovies.enqueue(new Callback<MovieResponse>() {
+                @Override
+                public void onResponse(Response<MovieResponse> response) {
+                    adapter.add(response.body().getResults());
+                }
 
-            @Override
-            public void onFailure(Throwable t) {
-                Log.e("Pablo", t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e("Pablo", t.getMessage());
+                }
+            });
+        } else {
+            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+        }
     }
 
     @Override
@@ -243,5 +257,26 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         super.onDestroy();
         RefWatcher refWatcher = PopularMoviesApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), PopularMoviesProvider.MOVIES.MOVIES_URI,
+                null,
+                null,
+                null,
+                null);
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        List<Movie> movies = DataBaseHelper.get().getMoviesFromCursor(data);
+        moviesRecyclerAdapter.add(movies);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        moviesRecyclerAdapter.clear();
     }
 }
