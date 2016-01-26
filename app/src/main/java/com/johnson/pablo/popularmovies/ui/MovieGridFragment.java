@@ -185,6 +185,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
                 }
             });
         } else {
+            adapter.clear();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
         }
     }
@@ -271,8 +272,11 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        List<Movie> movies = DataBaseHelper.get().getMoviesFromCursor(data);
-        moviesRecyclerAdapter.add(movies);
+        if (Sort.FAVORITES.name().equals(defSort.name())) {
+            moviesRecyclerAdapter.clear();
+            List<Movie> movies = DataBaseHelper.get().getMoviesFromCursor(data);
+            moviesRecyclerAdapter.add(movies);
+        }
     }
 
     @Override

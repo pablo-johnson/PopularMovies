@@ -1,9 +1,11 @@
 package com.johnson.pablo.popularmovies.models;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.johnson.pablo.popularmovies.models.data.MovieColumns;
 
 import java.util.List;
 
@@ -245,4 +247,24 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    public static ContentValues getMovieContentValue(Movie movie) {
+        ContentValues movieContentValues = new ContentValues();
+        movieContentValues.put(MovieColumns._ID, movie.getId());
+        movieContentValues.put(MovieColumns.OVERVIEW, movie.getOverview());
+        movieContentValues.put(MovieColumns.RELEASE_DATE, movie.getReleaseDate());
+        movieContentValues.put(MovieColumns.POSTER_PATH, movie.getPosterPath());
+        movieContentValues.put(MovieColumns.POSTER_PATH, movie.getPosterPath());
+        movieContentValues.put(MovieColumns.BACK_DROP_PATH, movie.getBackDropPath());
+        movieContentValues.put(MovieColumns.POPULARITY, movie.getPopularity());
+        movieContentValues.put(MovieColumns.TITLE, movie.getTitle());
+        movieContentValues.put(MovieColumns.VOTE_AVERAGE, movie.getVoteAverage());
+        movieContentValues.put(MovieColumns.VOTE_COUNT, movie.getVoteCount());
+        movieContentValues.put(MovieColumns.ORIGINAL_TITLE, movie.getOriginalTitle());
+        movieContentValues.put(MovieColumns.HAS_VIDEO, movie.isHasVideo() ? 1 : 0);
+        movieContentValues.put(MovieColumns.STR_GENRES, movie.getStrGenres());
+        movieContentValues.put(MovieColumns.ADDED_DATE, movie.getFavoriteAddedDate());
+
+        return movieContentValues;
+    }
 }

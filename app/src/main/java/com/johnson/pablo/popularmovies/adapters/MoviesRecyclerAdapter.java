@@ -87,7 +87,6 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         }
 
         if ((movie.getStrGenres() == null) && (movie.getGenres().length > 0)) {
-            ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
             StringBuilder genres = new StringBuilder();
             for (int genreKey : movie.getGenres()) {
                 genres.append(mGenresMap.get(genreKey));
@@ -96,6 +95,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             movie.setStrGenres(genres.substring(0, genres.length() - 2));
         }
         ((MovieHolder) holder).movieGenres.setText(movie.getStrGenres());
+        ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
     }
 
     @Override

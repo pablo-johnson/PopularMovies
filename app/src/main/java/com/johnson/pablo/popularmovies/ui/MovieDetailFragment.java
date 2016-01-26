@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.ExtrasAdapter;
+import com.johnson.pablo.popularmovies.helpers.DataBaseHelper;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.models.Movie;
@@ -67,6 +68,7 @@ public class MovieDetailFragment extends Fragment {
     private List<Review> reviewsList;
     private int TRAILER_ITEM_HEIGHT = 90;
     private int REVIEW_ITEM_HEIGHT = 103;
+    private boolean isFavorite;
 
     public MovieDetailFragment() {
         //setRetainInstance(true);
@@ -108,15 +110,6 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, contentView);
-
-        fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fabButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         return contentView;
     }
 
@@ -129,7 +122,7 @@ public class MovieDetailFragment extends Fragment {
         showReviews(movie);
     }
 
-    private void setUpUI(Movie movie) {
+    private void setUpUI(final Movie movie) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Bundle bundle = getArguments();
             String imageTransitionName = bundle.getString("IMAGE_TRANSITION_NAME");
@@ -145,6 +138,28 @@ public class MovieDetailFragment extends Fragment {
         movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
         movieReleaseDate.setText(movie.getReleaseDate());
         movieGenres.setText(movie.getStrGenres());
+
+        fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        isFavorite = DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId());
+        if (isFavorite){
+            fabButton.setImageResource(android.R.drawable.star_big_on);
+        }else{
+            fabButton.setImageResource(android.R.drawable.star_big_off);
+        }
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId())) {
+                    if (DataBaseHelper.get().inserMovieToFavorites(getActivity(), Movie.getMovieContentValue(movie)) > 0) {
+                        fabButton.setImageResource(android.R.drawable.star_big_on);
+                    }
+                } else {
+                    if (DataBaseHelper.get().deleteMovieFromFavorites(getActivity(), movie.getId()) > 0) {
+                        fabButton.setImageResource(android.R.drawable.star_big_off);
+                    }
+                }
+            }
+        });
     }
 
     private void showReviews(final Movie movie) {
