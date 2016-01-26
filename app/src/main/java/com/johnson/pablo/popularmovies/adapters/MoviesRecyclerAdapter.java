@@ -1,6 +1,5 @@
 package com.johnson.pablo.popularmovies.adapters;
 
-import android.annotation.TargetApi;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -16,9 +15,9 @@ import com.bumptech.glide.Glide;
 import com.github.florent37.glidepalette.BitmapPalette;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.johnson.pablo.popularmovies.R;
+import com.johnson.pablo.popularmovies.helpers.DataBaseHelper;
 import com.johnson.pablo.popularmovies.models.Movie;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public interface OnMovieClickListener {
         void onMovieClicked(@NonNull final Movie movie, View view, int position);
 
-        void onFavoredClicked(@NonNull final Movie movie, int position);
+        void onFavoredClicked(@NonNull final Movie movie, int position, boolean isFavored);
     }
 
     public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies, Map<Integer, String> genresMap) {
@@ -94,8 +93,23 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             }
             movie.setStrGenres(genres.substring(0, genres.length() - 2));
         }
+        if (movie.isFavorite() == null) {
+            movie.setFavorite(DataBaseHelper.get()
+                    .isMovieSavedAsFavorite(mFragment.getContext(), movie.getId()));
+        }
+
+        ((MovieHolder) holder).movieFavButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onFavoredClicked(movie, position, movie.isFavorite());
+            }
+        });
         ((MovieHolder) holder).movieGenres.setText(movie.getStrGenres());
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
+        ((MovieHolder) holder).movieFavButton.setImageResource(movie.isFavorite() ?
+                android.R.drawable.star_big_on :
+                android.R.drawable.star_big_off);
+
     }
 
     @Override
@@ -138,6 +152,8 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         View movieContainer;
         @Bind(R.id.movieDataContainer)
         View movieDataContainer;
+        @Bind(R.id.movieFavButton)
+        ImageView movieFavButton;
         @Bind(R.id.movieGenres)
         TextView movieGenres;
 

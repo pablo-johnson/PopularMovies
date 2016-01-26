@@ -237,8 +237,8 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     }
 
     @Override
-    public void onFavoredClicked(@NonNull Movie movie, int position) {
-
+    public void onFavoredClicked(@NonNull Movie movie, int position, boolean isFavored) {
+        DataBaseHelper.get().inserMovieToFavorites(getContext(), Movie.getMovieContentValue(movie));
     }
 
     @Override

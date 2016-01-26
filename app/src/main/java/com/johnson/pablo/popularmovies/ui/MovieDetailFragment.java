@@ -149,7 +149,7 @@ public class MovieDetailFragment extends Fragment {
         fabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId())) {
+                    if (!DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId())) {
                     if (DataBaseHelper.get().inserMovieToFavorites(getActivity(), Movie.getMovieContentValue(movie)) > 0) {
                         fabButton.setImageResource(android.R.drawable.star_big_on);
                     }
