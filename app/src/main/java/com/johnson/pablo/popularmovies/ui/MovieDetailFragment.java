@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,11 +18,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.johnson.pablo.popularmovies.R;
-import com.johnson.pablo.popularmovies.adapters.ReviewsAdapter;
+import com.johnson.pablo.popularmovies.adapters.ExtrasAdapter;
 import com.johnson.pablo.popularmovies.helpers.MovieApi;
 import com.johnson.pablo.popularmovies.interfaces.OnFragmentInteractionListener;
 import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.Review;
+import com.johnson.pablo.popularmovies.models.Video;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
 import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
 
@@ -55,11 +55,15 @@ public class MovieDetailFragment extends Fragment {
     TextView movieGenres;
     @Bind(R.id.reviewsList)
     RecyclerView reviewsListView;
+    @Bind(R.id.trailersList)
+    RecyclerView trailerListView;
     FloatingActionButton fabButton;
     private Call<VideoResponse> callVideos;
     private Call<ReviewResponse> callReviews;
-    private ArrayList<Object> trailersList;
+    private List<Video> trailersList;
     private List<Review> reviewsList;
+    private int TRAILER_ITEM_HEIGHT = 90;
+    private int REVIEW_ITEM_HEIGHT = 103;
 
     public MovieDetailFragment() {
         //setRetainInstance(true);
@@ -85,7 +89,7 @@ public class MovieDetailFragment extends Fragment {
         super.onStart();
         final Movie movie = getArguments().getParcelable("movie");
         setUpUI(movie);
-        //setupCalls(movie);
+        setupTrailerResponse(movie);
         setupReviewRecyclerView(movie);
     }
 
@@ -125,22 +129,19 @@ public class MovieDetailFragment extends Fragment {
     private void setupReviewRecyclerView(final Movie movie) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         reviewsListView.setLayoutManager(linearLayoutManager);
-        final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(getActivity(), null);
+        final ExtrasAdapter reviewsAdapter = new ExtrasAdapter(getActivity(), null, ExtrasAdapter.REVIEW_TYPE);
         reviewsListView.setAdapter(reviewsAdapter);
 
-        int id = movie.getId();
-        Log.e("Rasho", id + "");
-        callReviews = MovieApi.get().getRetrofitService().getReviews(id);
+        callReviews = MovieApi.get().getRetrofitService().getReviews(movie.getId());
         callReviews.enqueue(new Callback<ReviewResponse>() {
             @Override
             public void onResponse(Response<ReviewResponse> response) {
                 if (response != null && response.body() != null && response.body().getResults() != null) {
                     reviewsList = response.body().getResults();
-                    movie.setReviews(reviewsList);
                     ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
-                    lp.height = (int) (103 * Resources.getSystem().getDisplayMetrics().density * reviewsList.size());
+                    lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * reviewsList.size());
                     reviewsListView.setLayoutParams(lp);
-                    reviewsAdapter.addReviews(reviewsList);
+                    reviewsAdapter.addItems(reviewsList);
                 }
             }
 
@@ -151,13 +152,22 @@ public class MovieDetailFragment extends Fragment {
         });
     }
 
-    private void setupCalls(final Movie movie) {
+    private void setupTrailerResponse(final Movie movie) {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        trailerListView.setLayoutManager(linearLayoutManager);
+        final ExtrasAdapter trailersAdapter = new ExtrasAdapter(getActivity(), null, ExtrasAdapter.TRAILER_TYPE);
+        trailerListView.setAdapter(trailersAdapter);
+
         callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
         callVideos.enqueue(new Callback<VideoResponse>() {
             @Override
             public void onResponse(Response<VideoResponse> response) {
                 if (response.body() != null && response.body().getResults() != null) {
-                    movie.setVideos(response.body().getResults());
+                    trailersList = response.body().getResults();
+                    ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
+                    lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * trailersList.size());
+                    trailerListView.setLayoutParams(lp);
+                    trailersAdapter.addItems(trailersList);
                 }
             }
 

@@ -11,4 +11,5 @@
     <string name="voteAverageLabel">Vote Average:</string>
     <string name="movieGenresLabel">Genres:</string>
     <string name="reviewsLabel">Reviews:</string>
+    <string name="trailersLabel">Trailers:</string>
 </resources>

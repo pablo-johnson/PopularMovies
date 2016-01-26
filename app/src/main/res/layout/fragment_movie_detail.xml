@@ -111,10 +111,28 @@
             tools:text="Ipsum dolorem" />
 
         <TextView
-            android:id="@+id/reviewsLabel"
+            android:id="@+id/trailersLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/movieSynopsis"
+            android:layout_marginTop="20dp"
+            android:text="@string/trailersLabel"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/trailersList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/trailersLabel"
+            android:layout_marginTop="10dp"
+            android:scrollbars="none" />
+
+        <TextView
+            android:id="@+id/reviewsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/trailersList"
             android:layout_marginTop="20dp"
             android:text="@string/reviewsLabel"
             android:textColor="@color/black"
