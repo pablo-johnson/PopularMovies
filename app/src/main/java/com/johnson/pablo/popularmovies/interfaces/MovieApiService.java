@@ -5,7 +5,7 @@ import com.johnson.pablo.popularmovies.models.Sort;
 import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
 import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
-import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
+import com.johnson.pablo.popularmovies.models.responses.VideosResponse;
 
 import retrofit.Call;
 import retrofit.http.GET;
@@ -23,7 +23,7 @@ public interface MovieApiService {
     Call<GenreResponse> getMovieGenres();
 
     @GET("movie/{movieId}/videos?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
-    Call<VideoResponse> getMovieVideos(@Path("movieId") long movieId);
+    Call<VideosResponse> getMovieVideos(@Path("movieId") long movieId);
 
     @GET("movie/{movieID}/reviews?api_key=" + BuildConfig.MOVIE_DB_API_KEY)
     Call<ReviewResponse> getMovieReviews(@Path("movieID") long movieID);

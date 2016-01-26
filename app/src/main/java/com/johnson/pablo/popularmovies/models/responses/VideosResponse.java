@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Pablo on 11/01/16.
  */
-public class VideoResponse {
+public class VideosResponse {
 
     private int id;
     private List<Video> results = new ArrayList<>();

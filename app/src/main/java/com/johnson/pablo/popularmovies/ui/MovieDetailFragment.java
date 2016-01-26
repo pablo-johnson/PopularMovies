@@ -25,7 +25,7 @@ import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.Review;
 import com.johnson.pablo.popularmovies.models.Video;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
-import com.johnson.pablo.popularmovies.models.responses.VideoResponse;
+import com.johnson.pablo.popularmovies.models.responses.VideosResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class MovieDetailFragment extends Fragment {
     @Bind(R.id.trailersList)
     RecyclerView trailerListView;
     FloatingActionButton fabButton;
-    private Call<VideoResponse> callVideos;
+    private Call<VideosResponse> callVideos;
     private Call<ReviewResponse> callReviews;
     private List<Video> trailersList;
     private List<Review> reviewsList;
@@ -159,9 +159,9 @@ public class MovieDetailFragment extends Fragment {
         trailerListView.setAdapter(trailersAdapter);
 
         callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
-        callVideos.enqueue(new Callback<VideoResponse>() {
+        callVideos.enqueue(new Callback<VideosResponse>() {
             @Override
-            public void onResponse(Response<VideoResponse> response) {
+            public void onResponse(Response<VideosResponse> response) {
                 if (response.body() != null && response.body().getResults() != null) {
                     trailersList = response.body().getResults();
                     ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
