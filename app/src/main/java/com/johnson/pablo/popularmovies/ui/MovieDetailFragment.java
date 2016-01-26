@@ -1,8 +1,11 @@
 package com.johnson.pablo.popularmovies.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -85,15 +88,6 @@ public class MovieDetailFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        final Movie movie = getArguments().getParcelable("movie");
-        setUpUI(movie);
-        setupTrailerResponse(movie);
-        setupReviewRecyclerView(movie);
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -126,11 +120,39 @@ public class MovieDetailFragment extends Fragment {
         return contentView;
     }
 
-    private void setupReviewRecyclerView(final Movie movie) {
+    @Override
+    public void onStart() {
+        super.onStart();
+        final Movie movie = getArguments().getParcelable("movie");
+        setUpUI(movie);
+        showTrailers(movie);
+        showReviews(movie);
+    }
+
+    private void setUpUI(Movie movie) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Bundle bundle = getArguments();
+            String imageTransitionName = bundle.getString("IMAGE_TRANSITION_NAME");
+            movieImage.setTransitionName(imageTransitionName);
+        }
+        Glide.with(this)
+                .load(movie.getPosterPath())
+                .crossFade()
+                .placeholder(R.color.movie_poster_placeholder)
+                .into(movieImage);
+        mListener.loadToolbarImage(movie.getBackDropPath());
+        movieSynopsis.setText(movie.getOverview());
+        movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
+        movieReleaseDate.setText(movie.getReleaseDate());
+        movieGenres.setText(movie.getStrGenres());
+    }
+
+    private void showReviews(final Movie movie) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         reviewsListView.setLayoutManager(linearLayoutManager);
         final ExtrasAdapter reviewsAdapter = new ExtrasAdapter(getActivity(), null, ExtrasAdapter.REVIEW_TYPE);
         reviewsListView.setAdapter(reviewsAdapter);
+        reviewsAdapter.setExtraListener(extraClickListener);
 
         callReviews = MovieApi.get().getRetrofitService().getReviews(movie.getId());
         callReviews.enqueue(new Callback<ReviewResponse>() {
@@ -152,11 +174,12 @@ public class MovieDetailFragment extends Fragment {
         });
     }
 
-    private void setupTrailerResponse(final Movie movie) {
+    private void showTrailers(final Movie movie) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         trailerListView.setLayoutManager(linearLayoutManager);
         final ExtrasAdapter trailersAdapter = new ExtrasAdapter(getActivity(), null, ExtrasAdapter.TRAILER_TYPE);
         trailerListView.setAdapter(trailersAdapter);
+        trailersAdapter.setExtraListener(extraClickListener);
 
         callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
         callVideos.enqueue(new Callback<VideosResponse>() {
@@ -178,22 +201,29 @@ public class MovieDetailFragment extends Fragment {
         });
     }
 
-    private void setUpUI(Movie movie) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Bundle bundle = getArguments();
-            String imageTransitionName = bundle.getString("IMAGE_TRANSITION_NAME");
-            movieImage.setTransitionName(imageTransitionName);
+    ExtrasAdapter.OnExtraClickListener extraClickListener = new ExtrasAdapter.OnExtraClickListener() {
+
+        @Override
+        public void onReviewClicked(@NonNull Review review, View view, int position) {
+
         }
-        Glide.with(this)
-                .load(movie.getPosterPath())
-                .crossFade()
-                .placeholder(R.color.movie_poster_placeholder)
-                .into(movieImage);
-        mListener.loadToolbarImage(movie.getBackDropPath());
-        movieSynopsis.setText(movie.getOverview());
-        movieVoteAverage.setText(movie.getVoteAverage().toString() + "/10");
-        movieReleaseDate.setText(movie.getReleaseDate());
-        movieGenres.setText(movie.getStrGenres());
+
+        @Override
+        public void onTrailerClicked(@NonNull Video video, View view, int position) {
+            loadVideo(video);
+        }
+    };
+
+
+    public void loadVideo(Video video) {
+        String url = video.getVideoPath();
+        if (url != null) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            intent.setData(Uri.parse(url));
+            startActivity(Intent.createChooser(intent, getString(R.string.chooserIntentTitle)));
+        }
+
     }
 
     @Override

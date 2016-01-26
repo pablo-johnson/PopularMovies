@@ -12,4 +12,5 @@
     <string name="movieGenresLabel">Genres:</string>
     <string name="reviewsLabel">Reviews:</string>
     <string name="trailersLabel">Trailers:</string>
+    <string name="chooserIntentTitle">Choose:</string>
 </resources>

@@ -35,6 +35,10 @@ public class ExtrasAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     }
 
+    public void setExtraListener(@NonNull OnExtraClickListener listener) {
+        this.mListener = listener;
+    }
+
     public ExtrasAdapter(Context context, List<T> itemList, int itemViewType) {
         mItemList = itemList;
         mInflater = LayoutInflater.from(context);
@@ -94,10 +98,6 @@ public class ExtrasAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHold
             mItemList.addAll(items);
         }
         notifyDataSetChanged();
-    }
-
-    public void setListener(@NonNull OnExtraClickListener listener) {
-        this.mListener = listener;
     }
 
     final class ReviewHolder extends RecyclerView.ViewHolder {

@@ -98,4 +98,17 @@ public class Video implements Parcelable{
         dest.writeInt(size);
         dest.writeString(type);
     }
+
+
+
+    public String getVideoPath() {
+        if (site != null && key != null) {
+            String url = site;
+            if (site.equalsIgnoreCase("youtube")) {
+                url = String.format("https://www.youtube.com/watch?v=%s", key);
+            }
+            return url;
+        }
+        return null;
+    }
 }
