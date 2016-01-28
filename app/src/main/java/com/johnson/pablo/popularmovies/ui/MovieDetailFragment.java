@@ -213,6 +213,8 @@ public class MovieDetailFragment extends Fragment {
                                 * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size()),
                         trailerListView);
                 setShareIntent(movie.getVideos());
+            } else {
+                setHasOptionsMenu(false);
             }
         } else {
             callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
@@ -226,6 +228,8 @@ public class MovieDetailFragment extends Fragment {
                                         * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size()),
                                 trailerListView);
                         setShareIntent(movie.getVideos());
+                    } else {
+                        setHasOptionsMenu(false);
                     }
                 }
 
