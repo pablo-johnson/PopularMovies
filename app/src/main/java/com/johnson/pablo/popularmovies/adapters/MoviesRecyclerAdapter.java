@@ -40,8 +40,6 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public interface OnMovieClickListener {
         void onMovieClicked(@NonNull final Movie movie, View view, int position);
-
-        void onFavoredClicked(@NonNull final Movie movie, View view, boolean isFavored);
     }
 
     public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies, Map<Integer, String> genresMap) {
@@ -64,6 +62,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         Glide.with(mFragment)
                 .load(movie.getPosterPath())
                 .crossFade()
+                .error(R.drawable.placeholder_error)
                 .listener(GlidePalette.with(movie.getPosterPath())
                         .use(GlidePalette.Profile.VIBRANT)
                         .intoCallBack(new BitmapPalette.CallBack() {
@@ -78,7 +77,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                 }
                             }
                         }))
-                .placeholder(R.color.movie_poster_placeholder)
+                .placeholder(R.drawable.placeholder_loading)
                 .into(imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             imageView.setTransitionName("transition_image_" + position);
@@ -93,22 +92,8 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             }
             movie.setStrGenres(genres.substring(0, genres.length() - 2));
         }
-        if (movie.isFavorite() == null) {
-            movie.setFavorite(DataBaseHelper.get()
-                    .isMovieSavedAsFavorite(mFragment.getContext(), movie.getId()));
-        }
-
-        ((MovieHolder) holder).movieFavButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onFavoredClicked(movie, view, movie.isFavorite());
-            }
-        });
         ((MovieHolder) holder).movieGenres.setText(movie.getStrGenres());
         ((MovieHolder) holder).movieTitle.setText(movie.getTitle());
-        ((MovieHolder) holder).movieFavButton.setImageResource(movie.isFavorite() ?
-                android.R.drawable.star_big_on :
-                android.R.drawable.star_big_off);
 
     }
 
@@ -152,8 +137,6 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         View movieContainer;
         @Bind(R.id.movieDataContainer)
         View movieDataContainer;
-        @Bind(R.id.movieFavButton)
-        ImageView movieFavButton;
         @Bind(R.id.movieGenres)
         TextView movieGenres;
 

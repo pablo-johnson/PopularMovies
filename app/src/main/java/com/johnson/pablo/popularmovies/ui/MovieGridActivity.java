@@ -50,6 +50,8 @@ public class MovieGridActivity extends AppCompatActivity implements OnFragmentIn
                     .replace(R.id.fragment, MovieGridFragment.newInstance(), "MovieGridFragmentTag")
                     .addToBackStack("MovieGridFragmentName")
                     .commit();
+        } else {
+            findViewById(R.id.fab).setVisibility(View.VISIBLE);
         }
 
         mTwoPane = movieDetailContainer != null;

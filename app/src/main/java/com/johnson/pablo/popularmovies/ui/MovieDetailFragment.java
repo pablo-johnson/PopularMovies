@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,9 +30,6 @@ import com.johnson.pablo.popularmovies.models.Review;
 import com.johnson.pablo.popularmovies.models.Video;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
 import com.johnson.pablo.popularmovies.models.responses.VideosResponse;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -122,7 +119,8 @@ public class MovieDetailFragment extends Fragment {
         Glide.with(this)
                 .load(movie.getPosterPath())
                 .crossFade()
-                .placeholder(R.color.movie_poster_placeholder)
+                .error(R.drawable.placeholder_error)
+                .placeholder(R.drawable.placeholder_loading)
                 .into(movieImage);
         mListener.loadToolbarImage(movie.getBackDropPath());
         movieSynopsis.setText(movie.getOverview());

@@ -41,7 +41,7 @@ public class Movie implements Parcelable {
     int[] genres;
     private transient String strGenres;
     private transient String favoriteAddedDate;
-    private transient Boolean isFavorite;
+    private transient Boolean isFavorite = false;
     private List<Video> videos = new ArrayList<>();
     private List<Review> reviews = new ArrayList<>();
 
