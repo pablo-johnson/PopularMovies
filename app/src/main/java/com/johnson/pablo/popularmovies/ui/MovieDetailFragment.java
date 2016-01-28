@@ -9,10 +9,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +34,8 @@ import com.johnson.pablo.popularmovies.models.Review;
 import com.johnson.pablo.popularmovies.models.Video;
 import com.johnson.pablo.popularmovies.models.responses.ReviewResponse;
 import com.johnson.pablo.popularmovies.models.responses.VideosResponse;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -64,9 +70,9 @@ public class MovieDetailFragment extends Fragment {
     private int TRAILER_ITEM_HEIGHT = 90;
     private int REVIEW_ITEM_HEIGHT = 103;
     private boolean isFavorite;
+    private ShareActionProvider mShareActionProvider;
 
     public MovieDetailFragment() {
-        //setRetainInstance(true);
     }
 
     public static MovieDetailFragment newInstance(Movie movie) {
@@ -98,6 +104,7 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, contentView);
+        setHasOptionsMenu(true);
         return contentView;
     }
 
@@ -205,6 +212,7 @@ public class MovieDetailFragment extends Fragment {
                 setRecyclerViewHeightAndVisibility((int) (TRAILER_ITEM_HEIGHT
                                 * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size()),
                         trailerListView);
+                setShareIntent(movie.getVideos());
             }
         } else {
             callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
@@ -217,6 +225,7 @@ public class MovieDetailFragment extends Fragment {
                         setRecyclerViewHeightAndVisibility((int) (TRAILER_ITEM_HEIGHT
                                         * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size()),
                                 trailerListView);
+                        setShareIntent(movie.getVideos());
                     }
                 }
 
@@ -274,18 +283,27 @@ public class MovieDetailFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        if (callVideos != null) {
-            callVideos.cancel();
-        }
-        if (callReviews != null) {
-            callReviews.cancel();
-        }
-        super.onPause();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail, menu);
+        MenuItem item = menu.findItem(R.id.shareMenu);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    private void setShareIntent(List<Video> movieVideos) {
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(getShareIntent(movieVideos));
+            getActivity().invalidateOptionsMenu();
+        }
+    }
+
+    private Intent getShareIntent(List<Video> movieVideos) {
+        Video video = movieVideos.get(0);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, video.getVideoPath());
+        return shareIntent;
     }
 }

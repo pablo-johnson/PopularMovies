@@ -14,4 +14,5 @@
     <string name="trailersLabel">Trailers:</string>
     <string name="chooserIntentTitle">Choose:</string>
     <string name="movieImageContentDescription">Movie Image</string>
+    <string name="share">Share!</string>
 </resources>
