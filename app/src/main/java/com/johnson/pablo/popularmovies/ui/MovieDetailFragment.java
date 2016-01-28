@@ -163,16 +163,13 @@ public class MovieDetailFragment extends Fragment {
         reviewsAdapter.setExtraListener(extraClickListener);
 
         if (isFavorite) {
-            if (movie.getReviews().isEmpty()) {
-                movie.setReviews(DataBaseHelper.get().getReviews(getContext(), movie.getId()));
+            movie.setReviews(DataBaseHelper.get().getReviews(getContext(), movie.getId()));
+            if (!movie.getReviews().isEmpty()) {
+                reviewsAdapter.addItems(movie.getReviews());
+                setRecyclerViewHeightAndVisibility((int) (REVIEW_ITEM_HEIGHT
+                                * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size()),
+                        reviewsListView);
             }
-            reviewsAdapter.addItems(movie.getReviews());
-
-            ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
-            lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size());
-            reviewsListView.setLayoutParams(lp);
-            reviewsListView.setVisibility(View.VISIBLE);
-            ButterKnife.findById(getView(), R.id.reviewsLabel).setVisibility(View.VISIBLE);
         } else {
             callReviews = MovieApi.get().getRetrofitService().getReviews(movie.getId());
             callReviews.enqueue(new Callback<ReviewResponse>() {
@@ -182,12 +179,9 @@ public class MovieDetailFragment extends Fragment {
                             && !response.body().getResults().isEmpty()) {
                         movie.setReviews(response.body().getResults());
                         reviewsAdapter.addItems(movie.getReviews());
-
-                        reviewsListView.setVisibility(View.VISIBLE);
-                        ButterKnife.findById(getView(), R.id.reviewsLabel).setVisibility(View.VISIBLE);
-                        ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
-                        lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size());
-                        reviewsListView.setLayoutParams(lp);
+                        setRecyclerViewHeightAndVisibility((int) (REVIEW_ITEM_HEIGHT
+                                        * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size()),
+                                reviewsListView);
                     }
                 }
 
@@ -207,16 +201,13 @@ public class MovieDetailFragment extends Fragment {
         trailersAdapter.setExtraListener(extraClickListener);
 
         if (isFavorite) {
-            if (movie.getVideos().isEmpty()) {
-                movie.setVideos(DataBaseHelper.get().getVideos(getContext(), movie.getId()));
+            movie.setVideos(DataBaseHelper.get().getVideos(getContext(), movie.getId()));
+            if (!movie.getVideos().isEmpty()) {
+                trailersAdapter.addItems(movie.getVideos());
+                setRecyclerViewHeightAndVisibility((int) (TRAILER_ITEM_HEIGHT
+                                * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size()),
+                        trailerListView);
             }
-            trailersAdapter.addItems(movie.getVideos());
-
-            trailerListView.setVisibility(View.VISIBLE);
-            ButterKnife.findById(getView(), R.id.trailersLabel).setVisibility(View.VISIBLE);
-            ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
-            lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size());
-            trailerListView.setLayoutParams(lp);
         } else {
             callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
             callVideos.enqueue(new Callback<VideosResponse>() {
@@ -225,12 +216,9 @@ public class MovieDetailFragment extends Fragment {
                     if ((response.body() != null) && (response.body().getResults() != null) && !response.body().getResults().isEmpty()) {
                         movie.setVideos(response.body().getResults());
                         trailersAdapter.addItems(movie.getVideos());
-
-                        trailerListView.setVisibility(View.VISIBLE);
-                        ButterKnife.findById(getView(), R.id.trailersLabel).setVisibility(View.VISIBLE);
-                        ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
-                        lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size());
-                        trailerListView.setLayoutParams(lp);
+                        setRecyclerViewHeightAndVisibility((int) (TRAILER_ITEM_HEIGHT
+                                        * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size()),
+                                trailerListView);
                     }
                 }
 
@@ -241,6 +229,14 @@ public class MovieDetailFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void setRecyclerViewHeightAndVisibility(int height, RecyclerView recyclerView) {
+        recyclerView.setVisibility(View.VISIBLE);
+        ButterKnife.findById(getView(), R.id.trailersLabel).setVisibility(View.VISIBLE);
+        ViewGroup.LayoutParams lp = recyclerView.getLayoutParams();
+        lp.height = height;
+        recyclerView.setLayoutParams(lp);
     }
 
     ExtrasAdapter.OnExtraClickListener extraClickListener = new ExtrasAdapter.OnExtraClickListener() {
