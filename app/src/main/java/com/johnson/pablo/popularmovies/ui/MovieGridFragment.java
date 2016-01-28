@@ -237,8 +237,18 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     }
 
     @Override
-    public void onFavoredClicked(@NonNull Movie movie, int position, boolean isFavored) {
-        DataBaseHelper.get().inserMovieToFavorites(getContext(), Movie.getMovieContentValue(movie));
+    public void onFavoredClicked(@NonNull Movie movie, View view, boolean isFavored) {
+        if (isFavored) {
+            if (DataBaseHelper.get().deleteMovieFromFavorites(getActivity(), movie.getId()) > 0) {
+                ((ImageView) view.findViewById(R.id.movieFavButton)).setImageResource(android.R.drawable.star_big_off);
+            }
+        } else {
+            if (DataBaseHelper.get().inserMovieToFavorites(getActivity(), Movie.getMovieContentValue(movie)) > 0) {
+                ((ImageView) view.findViewById(R.id.movieFavButton)).setImageResource(android.R.drawable.star_big_on);
+
+            }
+        }
+        movie.setFavorite(!isFavored);
     }
 
     @Override

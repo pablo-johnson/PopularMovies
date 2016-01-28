@@ -41,7 +41,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public interface OnMovieClickListener {
         void onMovieClicked(@NonNull final Movie movie, View view, int position);
 
-        void onFavoredClicked(@NonNull final Movie movie, int position, boolean isFavored);
+        void onFavoredClicked(@NonNull final Movie movie, View view, boolean isFavored);
     }
 
     public MoviesRecyclerAdapter(@NonNull Fragment fragment, List<Movie> movies, Map<Integer, String> genresMap) {
@@ -101,7 +101,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         ((MovieHolder) holder).movieFavButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onFavoredClicked(movie, position, movie.isFavorite());
+                mListener.onFavoredClicked(movie, view, movie.isFavorite());
             }
         });
         ((MovieHolder) holder).movieGenres.setText(movie.getStrGenres());
