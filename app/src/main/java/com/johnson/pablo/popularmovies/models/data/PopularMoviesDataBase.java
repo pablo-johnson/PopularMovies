@@ -9,8 +9,12 @@ import net.simonvt.schematic.annotation.Table;
 @Database(version = PopularMoviesDataBase.VERSION)
 public final class PopularMoviesDataBase {
 
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     @Table(MovieColumns.class)
     public static final String MOVIES = "movies";
+    @Table(VideoColumns.class)
+    public static final String VIDEOS = "videos";
+    @Table(ReviewColumns.class)
+    public static final String REVIEWS = "reviews";
 }

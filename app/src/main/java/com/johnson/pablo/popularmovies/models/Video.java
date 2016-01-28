@@ -1,12 +1,15 @@
 package com.johnson.pablo.popularmovies.models;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.johnson.pablo.popularmovies.models.data.VideoColumns;
 
 /**
  * Created by Pablo on 11/01/16.
  */
-public class Video implements Parcelable{
+public class Video implements Parcelable {
 
     private String id;
     private String key;
@@ -99,8 +102,6 @@ public class Video implements Parcelable{
         dest.writeString(type);
     }
 
-
-
     public String getVideoPath() {
         if (site != null && key != null) {
             String url = site;
@@ -110,5 +111,16 @@ public class Video implements Parcelable{
             return url;
         }
         return null;
+    }
+
+    public static ContentValues getContentValue(Video video, long movieId) {
+        ContentValues videoVContentValues = new ContentValues();
+        videoVContentValues.put(VideoColumns.VIDEO_ID, video.getId());
+        videoVContentValues.put(VideoColumns.MOVIE_ID, movieId);
+        videoVContentValues.put(VideoColumns.NAME, video.getName());
+        videoVContentValues.put(VideoColumns.SITE, video.getSite());
+        videoVContentValues.put(VideoColumns.KEY, video.getKey());
+
+        return videoVContentValues;
     }
 }

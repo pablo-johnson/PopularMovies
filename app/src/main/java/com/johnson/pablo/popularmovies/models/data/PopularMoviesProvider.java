@@ -18,6 +18,8 @@ public class PopularMoviesProvider {
 
     interface Path {
         String MOVIES = "movies";
+        String REVIEWS = "reviews";
+        String VIDEOS = "videos";
     }
 
     private static Uri buildUri(String... paths) {
@@ -45,6 +47,46 @@ public class PopularMoviesProvider {
                 pathSegment = 1)
         public static Uri withId(long id) {
             return buildUri(Path.MOVIES, String.valueOf(id));
+        }
+    }
+
+    @TableEndpoint(table = PopularMoviesDataBase.REVIEWS)
+    public static class REVIEWS {
+
+        @ContentUri(
+                path = Path.REVIEWS,
+                type = "vnd.android.cursor.dir/review",
+                defaultSort = ReviewColumns._ID + " ASC")
+        public static final Uri REVIEWS_URI = buildUri(Path.REVIEWS);
+
+        @InexactContentUri(
+                name = "REVIEW_ID",
+                path = Path.REVIEWS + "/#",
+                type = "vnd.android.cursor.item/review",
+                whereColumn = ReviewColumns.MOVIE_ID,
+                pathSegment = 1)
+        public static Uri withMovieId(long movieId) {
+            return buildUri(Path.REVIEWS, String.valueOf(movieId));
+        }
+    }
+
+    @TableEndpoint(table = PopularMoviesDataBase.VIDEOS)
+    public static class VIDEOS {
+
+        @ContentUri(
+                path = Path.VIDEOS,
+                type = "vnd.android.cursor.dir/video",
+                defaultSort = VideoColumns._ID + " ASC")
+        public static final Uri VIDEOS_URI = buildUri(Path.VIDEOS);
+
+        @InexactContentUri(
+                name = "VIDEO_ID",
+                path = Path.VIDEOS + "/#",
+                type = "vnd.android.cursor.item/video",
+                whereColumn = VideoColumns.MOVIE_ID,
+                pathSegment = 1)
+        public static Uri withMovieId(long movieId) {
+            return buildUri(Path.VIDEOS, String.valueOf(movieId));
         }
     }
 }

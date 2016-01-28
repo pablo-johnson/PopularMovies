@@ -7,11 +7,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,8 +64,6 @@ public class MovieDetailFragment extends Fragment {
     FloatingActionButton fabButton;
     private Call<VideosResponse> callVideos;
     private Call<ReviewResponse> callReviews;
-    private List<Video> trailersList;
-    private List<Review> reviewsList;
     private int TRAILER_ITEM_HEIGHT = 90;
     private int REVIEW_ITEM_HEIGHT = 103;
     private boolean isFavorite;
@@ -80,13 +78,6 @@ public class MovieDetailFragment extends Fragment {
         bundle.putParcelable("movie", movie);
         fragment.setArguments(bundle);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        trailersList = new ArrayList<>();
-        reviewsList = new ArrayList<>();
     }
 
     @Override
@@ -141,16 +132,16 @@ public class MovieDetailFragment extends Fragment {
 
         fabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         isFavorite = DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId());
-        if (isFavorite){
+        if (isFavorite) {
             fabButton.setImageResource(android.R.drawable.star_big_on);
-        }else{
+        } else {
             fabButton.setImageResource(android.R.drawable.star_big_off);
         }
         fabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    if (!DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId())) {
-                    if (DataBaseHelper.get().inserMovieToFavorites(getActivity(), Movie.getMovieContentValue(movie)) > 0) {
+                if (!DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId())) {
+                    if (DataBaseHelper.get().insertMovieToFavorites(getActivity(), movie) > 0) {
                         fabButton.setImageResource(android.R.drawable.star_big_on);
                     }
                 } else {
@@ -174,17 +165,17 @@ public class MovieDetailFragment extends Fragment {
             @Override
             public void onResponse(Response<ReviewResponse> response) {
                 if (response != null && response.body() != null && response.body().getResults() != null) {
-                    reviewsList = response.body().getResults();
+                    movie.setReviews(response.body().getResults());
                     ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
-                    lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * reviewsList.size());
+                    lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size());
                     reviewsListView.setLayoutParams(lp);
-                    reviewsAdapter.addItems(reviewsList);
+                    reviewsAdapter.addItems(movie.getReviews());
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                Log.e("Pablo",t.getLocalizedMessage());
             }
         });
     }
@@ -201,16 +192,17 @@ public class MovieDetailFragment extends Fragment {
             @Override
             public void onResponse(Response<VideosResponse> response) {
                 if (response.body() != null && response.body().getResults() != null) {
-                    trailersList = response.body().getResults();
+                    movie.setVideos(response.body().getResults());
                     ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
-                    lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * trailersList.size());
+                    lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size());
                     trailerListView.setLayoutParams(lp);
-                    trailersAdapter.addItems(trailersList);
+                    trailersAdapter.addItems(movie.getVideos());
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
+                Log.e("Pablo",t.getLocalizedMessage());
 
             }
         });

@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 import com.johnson.pablo.popularmovies.models.data.MovieColumns;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,8 +42,8 @@ public class Movie implements Parcelable {
     private transient String strGenres;
     private transient String favoriteAddedDate;
     private transient Boolean isFavorite;
-    private List<Video> videos;
-    private List<Review> reviews;
+    private List<Video> videos = new ArrayList<>();
+    private List<Review> reviews = new ArrayList<>();
 
     public Movie() {
     }
@@ -259,7 +260,7 @@ public class Movie implements Parcelable {
         }
     };
 
-    public static ContentValues getMovieContentValue(Movie movie) {
+    public static ContentValues getContentValue(Movie movie) {
         ContentValues movieContentValues = new ContentValues();
         movieContentValues.put(MovieColumns._ID, movie.getId());
         movieContentValues.put(MovieColumns.OVERVIEW, movie.getOverview());

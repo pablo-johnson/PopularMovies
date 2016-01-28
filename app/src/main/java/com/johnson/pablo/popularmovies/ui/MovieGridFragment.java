@@ -243,7 +243,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
                 ((ImageView) view.findViewById(R.id.movieFavButton)).setImageResource(android.R.drawable.star_big_off);
             }
         } else {
-            if (DataBaseHelper.get().inserMovieToFavorites(getActivity(), Movie.getMovieContentValue(movie)) > 0) {
+            if (DataBaseHelper.get().insertMovieToFavorites(getActivity(), movie) > 0) {
                 ((ImageView) view.findViewById(R.id.movieFavButton)).setImageResource(android.R.drawable.star_big_on);
 
             }
