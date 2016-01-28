@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.johnson.pablo.popularmovies.PopularMoviesApplication;
 import com.johnson.pablo.popularmovies.R;
 import com.johnson.pablo.popularmovies.adapters.MoviesRecyclerAdapter;
 import com.johnson.pablo.popularmovies.helpers.DataBaseHelper;
@@ -40,7 +39,6 @@ import com.johnson.pablo.popularmovies.models.Sort;
 import com.johnson.pablo.popularmovies.models.data.PopularMoviesProvider;
 import com.johnson.pablo.popularmovies.models.responses.GenreResponse;
 import com.johnson.pablo.popularmovies.models.responses.MovieResponse;
-import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -245,7 +243,6 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         } else {
             if (DataBaseHelper.get().insertMovieToFavorites(getActivity(), movie) > 0) {
                 ((ImageView) view.findViewById(R.id.movieFavButton)).setImageResource(android.R.drawable.star_big_on);
-
             }
         }
         movie.setFavorite(!isFavored);
@@ -264,19 +261,8 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        RefWatcher refWatcher = PopularMoviesApplication.getRefWatcher(getActivity());
-        refWatcher.watch(this);
-    }
-
-    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), PopularMoviesProvider.MOVIES.MOVIES_URI,
-                null,
-                null,
-                null,
-                null);
+        return new CursorLoader(getActivity(), PopularMoviesProvider.MOVIES.MOVIES_URI, null, null, null, null);
     }
 
 
@@ -284,7 +270,7 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (Sort.FAVORITES.name().equals(defSort.name())) {
             moviesRecyclerAdapter.clear();
-            List<Movie> movies = DataBaseHelper.get().getMoviesFromCursor(data);
+            List<Movie> movies = DataBaseHelper.get().getMoviesFromCursor(getContext(), data);
             moviesRecyclerAdapter.add(movies);
         }
     }

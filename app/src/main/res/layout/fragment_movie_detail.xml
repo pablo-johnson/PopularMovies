@@ -23,6 +23,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginTop="10dp"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/movieImageContentDescription"
             android:scaleType="fitXY"
             android:transitionName="@string/fragment_image_trans" />
 
@@ -118,7 +119,8 @@
             android:layout_marginTop="20dp"
             android:text="@string/trailersLabel"
             android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/trailersList"
@@ -126,7 +128,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/trailersLabel"
             android:layout_marginTop="10dp"
-            android:scrollbars="none" />
+            android:scrollbars="none"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/reviewsLabel"
@@ -136,7 +139,8 @@
             android:layout_marginTop="20dp"
             android:text="@string/reviewsLabel"
             android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/reviewsList"
@@ -144,7 +148,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/reviewsLabel"
             android:layout_marginTop="10dp"
-            android:scrollbars="none" />
+            android:scrollbars="none"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

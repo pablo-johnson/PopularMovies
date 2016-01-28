@@ -222,8 +222,6 @@ public class Movie implements Parcelable {
         dest.writeString(this.homepage);
         dest.writeIntArray(genres);
         dest.writeString(strGenres);
-        dest.writeList(videos);
-        dest.writeList(reviews);
         dest.writeString(favoriteAddedDate);
         dest.writeByte(isFavorite ? (byte) 1 : (byte) 0);
     }
@@ -244,8 +242,6 @@ public class Movie implements Parcelable {
         this.homepage = in.readString();
         this.genres = in.createIntArray();
         this.strGenres = in.readString();
-        this.videos = in.readArrayList(null);
-        this.reviews = in.readArrayList(null);
         this.favoriteAddedDate = in.readString();
         this.isFavorite = in.readByte() != 0;
     }
@@ -276,6 +272,7 @@ public class Movie implements Parcelable {
         movieContentValues.put(MovieColumns.HAS_VIDEO, movie.isHasVideo() ? 1 : 0);
         movieContentValues.put(MovieColumns.STR_GENRES, movie.getStrGenres());
         movieContentValues.put(MovieColumns.ADDED_DATE, movie.getFavoriteAddedDate());
+        movieContentValues.put(MovieColumns.IS_FAVORITE, movie.isFavorite() ? 1 : 0);
 
         return movieContentValues;
     }

@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.johnson.pablo.popularmovies.models.Movie;
 import com.johnson.pablo.popularmovies.models.Review;
 import com.johnson.pablo.popularmovies.models.Video;
 import com.johnson.pablo.popularmovies.models.data.MovieColumns;
 import com.johnson.pablo.popularmovies.models.data.PopularMoviesProvider;
+import com.johnson.pablo.popularmovies.models.data.ReviewColumns;
+import com.johnson.pablo.popularmovies.models.data.VideoColumns;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,26 +39,71 @@ public class DataBaseHelper {
         return instance;
     }
 
-    public List<Movie> getMoviesFromCursor(Cursor movieCursor) {
+    public List<Movie> getMoviesFromCursor(Context context, Cursor movieCursor) {
         List<Movie> movies = new ArrayList<>();
         while (movieCursor.moveToNext()) {
-            Movie movie = new Movie();
-            movie.setId(movieCursor.getInt(movieCursor.getColumnIndex(MovieColumns._ID)));
-            movie.setOverview(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.OVERVIEW)));
-            movie.setReleaseDate(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.RELEASE_DATE)));
-            movie.setPosterPath(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.POSTER_PATH)));
-            movie.setBackDropPath(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.BACK_DROP_PATH)));
-            movie.setPopularity(movieCursor.getDouble(movieCursor.getColumnIndex(MovieColumns.POPULARITY)));
-            movie.setTitle(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.TITLE)));
-            movie.setVoteAverage(movieCursor.getDouble(movieCursor.getColumnIndex(MovieColumns.VOTE_AVERAGE)));
-            movie.setVoteCount(movieCursor.getInt(movieCursor.getColumnIndex(MovieColumns.VOTE_COUNT)));
-            movie.setOriginalTitle(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.ORIGINAL_TITLE)));
-            movie.setHasVideo(movieCursor.getInt(movieCursor.getColumnIndex(MovieColumns.HAS_VIDEO)) > 0);
-            movie.setStrGenres(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.STR_GENRES)));
-            movie.setFavoriteAddedDate(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.ADDED_DATE)));
+            Movie movie = getMovieFromCursor(movieCursor);
             movies.add(movie);
+            movie.setVideos(getVideos(context, movie.getId()));
+            movie.setReviews(getReviews(context, movie.getId()));
         }
         return movies;
+    }
+
+    public List<Review> getReviews(Context context, int movieId) {
+        Cursor reviewCursor = context.getContentResolver()
+                .query(PopularMoviesProvider.REVIEWS.withMovieId(movieId), null, null, null, null);
+        List<Review> reviews = new ArrayList<>();
+        if (reviewCursor != null) {
+            while (reviewCursor.moveToNext()) {
+                Review review = new Review();
+                review.setId(reviewCursor.getString(reviewCursor.getColumnIndex(ReviewColumns.REVIEW_ID)));
+                review.setAuthor(reviewCursor.getString(reviewCursor.getColumnIndex(ReviewColumns.AUTHOR)));
+                review.setContent(reviewCursor.getString(reviewCursor.getColumnIndex(ReviewColumns.CONTENT)));
+                review.setUrl(reviewCursor.getString(reviewCursor.getColumnIndex(ReviewColumns.URL)));
+                reviews.add(review);
+            }
+            reviewCursor.close();
+        }
+        return reviews;
+    }
+
+    @NonNull
+    public List<Video> getVideos(Context context, int movieId) {
+        Cursor videoCursor = context.getContentResolver()
+                .query(PopularMoviesProvider.VIDEOS.withMovieId(movieId), null, null, null, null);
+        List<Video> videos = new ArrayList<>();
+        if (videoCursor != null) {
+            while (videoCursor.moveToNext()) {
+                Video video = new Video();
+                video.setId(videoCursor.getString(videoCursor.getColumnIndex(VideoColumns.VIDEO_ID)));
+                video.setKey(videoCursor.getString(videoCursor.getColumnIndex(VideoColumns.KEY)));
+                video.setName(videoCursor.getString(videoCursor.getColumnIndex(VideoColumns.NAME)));
+                video.setSite(videoCursor.getString(videoCursor.getColumnIndex(VideoColumns.SITE)));
+
+                videos.add(video);
+            }
+            videoCursor.close();
+        }
+        return videos;
+    }
+
+    private Movie getMovieFromCursor(Cursor movieCursor) {
+        Movie movie = new Movie();
+        movie.setId(movieCursor.getInt(movieCursor.getColumnIndex(MovieColumns._ID)));
+        movie.setOverview(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.OVERVIEW)));
+        movie.setReleaseDate(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.RELEASE_DATE)));
+        movie.setPosterPath(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.POSTER_PATH)));
+        movie.setBackDropPath(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.BACK_DROP_PATH)));
+        movie.setPopularity(movieCursor.getDouble(movieCursor.getColumnIndex(MovieColumns.POPULARITY)));
+        movie.setTitle(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.TITLE)));
+        movie.setVoteAverage(movieCursor.getDouble(movieCursor.getColumnIndex(MovieColumns.VOTE_AVERAGE)));
+        movie.setVoteCount(movieCursor.getInt(movieCursor.getColumnIndex(MovieColumns.VOTE_COUNT)));
+        movie.setOriginalTitle(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.ORIGINAL_TITLE)));
+        movie.setHasVideo(movieCursor.getInt(movieCursor.getColumnIndex(MovieColumns.HAS_VIDEO)) > 0);
+        movie.setStrGenres(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.STR_GENRES)));
+        movie.setFavoriteAddedDate(movieCursor.getString(movieCursor.getColumnIndex(MovieColumns.ADDED_DATE)));
+        return movie;
     }
 
     private long insertMovieToFavorites(Context context, ContentValues movieContentValues) {
@@ -74,7 +122,7 @@ public class DataBaseHelper {
             insertReviews(context, movie);
         }
         if (!movie.getVideos().isEmpty()) {
-            //insertVideos(context, movie);
+            insertVideos(context, movie);
         }
         return movieId;
     }
@@ -110,9 +158,6 @@ public class DataBaseHelper {
     public boolean isMovieSavedAsFavorite(Context context, long movieId) {
         String movieKey = String.format(MOVIE_KEY, movieId);
         SharedPreferences sharedPreferences = context.getSharedPreferences(POPULAR_MOVIES_STORAGE, Context.MODE_PRIVATE);
-        if (sharedPreferences.getInt(movieKey, 0) > 0) {
-            return true;
-        }
-        return false;
+        return sharedPreferences.getInt(movieKey, 0) > 0;
     }
 }

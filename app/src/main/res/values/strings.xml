@@ -13,4 +13,5 @@
     <string name="reviewsLabel">Reviews:</string>
     <string name="trailersLabel">Trailers:</string>
     <string name="chooserIntentTitle">Choose:</string>
+    <string name="movieImageContentDescription">Movie Image</string>
 </resources>

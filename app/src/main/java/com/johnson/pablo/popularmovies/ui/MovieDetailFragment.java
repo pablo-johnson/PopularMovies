@@ -109,8 +109,8 @@ public class MovieDetailFragment extends Fragment {
         super.onStart();
         final Movie movie = getArguments().getParcelable("movie");
         setUpUI(movie);
-        showTrailers(movie);
-        showReviews(movie);
+        showTrailers(movie, isFavorite);
+        showReviews(movie, isFavorite);
     }
 
     private void setUpUI(final Movie movie) {
@@ -143,69 +143,104 @@ public class MovieDetailFragment extends Fragment {
                 if (!DataBaseHelper.get().isMovieSavedAsFavorite(getActivity(), movie.getId())) {
                     if (DataBaseHelper.get().insertMovieToFavorites(getActivity(), movie) > 0) {
                         fabButton.setImageResource(android.R.drawable.star_big_on);
+                        movie.setFavorite(true);
                     }
                 } else {
                     if (DataBaseHelper.get().deleteMovieFromFavorites(getActivity(), movie.getId()) > 0) {
                         fabButton.setImageResource(android.R.drawable.star_big_off);
+                        movie.setFavorite(false);
                     }
                 }
             }
         });
     }
 
-    private void showReviews(final Movie movie) {
+    private void showReviews(final Movie movie, boolean isFavorite) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         reviewsListView.setLayoutManager(linearLayoutManager);
         final ExtrasAdapter reviewsAdapter = new ExtrasAdapter(getActivity(), null, ExtrasAdapter.REVIEW_TYPE);
         reviewsListView.setAdapter(reviewsAdapter);
         reviewsAdapter.setExtraListener(extraClickListener);
 
-        callReviews = MovieApi.get().getRetrofitService().getReviews(movie.getId());
-        callReviews.enqueue(new Callback<ReviewResponse>() {
-            @Override
-            public void onResponse(Response<ReviewResponse> response) {
-                if (response != null && response.body() != null && response.body().getResults() != null) {
-                    movie.setReviews(response.body().getResults());
-                    ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
-                    lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size());
-                    reviewsListView.setLayoutParams(lp);
-                    reviewsAdapter.addItems(movie.getReviews());
-                }
+        if (isFavorite) {
+            if (movie.getReviews().isEmpty()) {
+                movie.setReviews(DataBaseHelper.get().getReviews(getContext(), movie.getId()));
             }
+            reviewsAdapter.addItems(movie.getReviews());
 
-            @Override
-            public void onFailure(Throwable t) {
-                Log.e("Pablo",t.getLocalizedMessage());
-            }
-        });
+            ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
+            lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size());
+            reviewsListView.setLayoutParams(lp);
+            reviewsListView.setVisibility(View.VISIBLE);
+            ButterKnife.findById(getView(), R.id.reviewsLabel).setVisibility(View.VISIBLE);
+        } else {
+            callReviews = MovieApi.get().getRetrofitService().getReviews(movie.getId());
+            callReviews.enqueue(new Callback<ReviewResponse>() {
+                @Override
+                public void onResponse(Response<ReviewResponse> response) {
+                    if ((response != null) && (response.body() != null) && (response.body().getResults() != null)
+                            && !response.body().getResults().isEmpty()) {
+                        movie.setReviews(response.body().getResults());
+                        reviewsAdapter.addItems(movie.getReviews());
+
+                        reviewsListView.setVisibility(View.VISIBLE);
+                        ButterKnife.findById(getView(), R.id.reviewsLabel).setVisibility(View.VISIBLE);
+                        ViewGroup.LayoutParams lp = reviewsListView.getLayoutParams();
+                        lp.height = (int) (REVIEW_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getReviews().size());
+                        reviewsListView.setLayoutParams(lp);
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e("Pablo", t.getLocalizedMessage());
+                }
+            });
+        }
     }
 
-    private void showTrailers(final Movie movie) {
+    private void showTrailers(final Movie movie, boolean isFavorite) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         trailerListView.setLayoutManager(linearLayoutManager);
         final ExtrasAdapter trailersAdapter = new ExtrasAdapter(getActivity(), null, ExtrasAdapter.TRAILER_TYPE);
         trailerListView.setAdapter(trailersAdapter);
         trailersAdapter.setExtraListener(extraClickListener);
 
-        callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
-        callVideos.enqueue(new Callback<VideosResponse>() {
-            @Override
-            public void onResponse(Response<VideosResponse> response) {
-                if (response.body() != null && response.body().getResults() != null) {
-                    movie.setVideos(response.body().getResults());
-                    ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
-                    lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size());
-                    trailerListView.setLayoutParams(lp);
-                    trailersAdapter.addItems(movie.getVideos());
+        if (isFavorite) {
+            if (movie.getVideos().isEmpty()) {
+                movie.setVideos(DataBaseHelper.get().getVideos(getContext(), movie.getId()));
+            }
+            trailersAdapter.addItems(movie.getVideos());
+
+            trailerListView.setVisibility(View.VISIBLE);
+            ButterKnife.findById(getView(), R.id.trailersLabel).setVisibility(View.VISIBLE);
+            ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
+            lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size());
+            trailerListView.setLayoutParams(lp);
+        } else {
+            callVideos = MovieApi.get().getRetrofitService().getMovieVideos(movie.getId());
+            callVideos.enqueue(new Callback<VideosResponse>() {
+                @Override
+                public void onResponse(Response<VideosResponse> response) {
+                    if ((response.body() != null) && (response.body().getResults() != null) && !response.body().getResults().isEmpty()) {
+                        movie.setVideos(response.body().getResults());
+                        trailersAdapter.addItems(movie.getVideos());
+
+                        trailerListView.setVisibility(View.VISIBLE);
+                        ButterKnife.findById(getView(), R.id.trailersLabel).setVisibility(View.VISIBLE);
+                        ViewGroup.LayoutParams lp = trailerListView.getLayoutParams();
+                        lp.height = (int) (TRAILER_ITEM_HEIGHT * Resources.getSystem().getDisplayMetrics().density * movie.getVideos().size());
+                        trailerListView.setLayoutParams(lp);
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Throwable t) {
-                Log.e("Pablo",t.getLocalizedMessage());
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e("Pablo", t.getLocalizedMessage());
 
-            }
-        });
+                }
+            });
+        }
     }
 
     ExtrasAdapter.OnExtraClickListener extraClickListener = new ExtrasAdapter.OnExtraClickListener() {

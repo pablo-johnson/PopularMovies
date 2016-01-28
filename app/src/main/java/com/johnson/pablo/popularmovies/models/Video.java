@@ -18,6 +18,9 @@ public class Video implements Parcelable {
     private int size;
     private String type;
 
+    public Video() {
+    }
+
     public String getId() {
         return id;
     }

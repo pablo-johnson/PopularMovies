@@ -36,5 +36,7 @@ public interface MovieColumns {
     public static final String STR_GENRES = "strGenres";
     @DataType(DataType.Type.TEXT)
     public static final String ADDED_DATE = "addedDate";
+    @DataType(DataType.Type.INTEGER)
+    public static final String IS_FAVORITE = "isFavorite";
 
 }
