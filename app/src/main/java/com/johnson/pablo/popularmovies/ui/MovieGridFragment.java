@@ -88,8 +88,10 @@ public class MovieGridFragment extends Fragment implements MoviesRecyclerAdapter
         callGenres.enqueue(new Callback<GenreResponse>() {
             @Override
             public void onResponse(Response<GenreResponse> response) {
-                for (Genre genre : response.body().getGenres()) {
-                    genresMap.put(genre.getId(), genre.getName());
+                if (response.body() != null && response.body().getGenres() != null) {
+                    for (Genre genre : response.body().getGenres()) {
+                        genresMap.put(genre.getId(), genre.getName());
+                    }
                 }
             }
 
